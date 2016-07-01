@@ -1,5 +1,5 @@
 CPP=g++
-CFLAGS=
+CFLAGS=-std=c++14
 LIBS=-lasound
 DEPS = microphone.h
 OBJ = main.o microphone.o
