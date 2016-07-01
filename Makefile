@@ -1,8 +1,8 @@
 CPP=g++
 CFLAGS=-std=c++14
 LIBS=-lasound
-DEPS = microphone.h
-OBJ = main.o microphone.o
+DEPS = microphone.h soundProcessing.h
+OBJ = main.o microphone.o soundProcessing.o
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
