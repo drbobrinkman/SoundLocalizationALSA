@@ -20,14 +20,23 @@
  **/
 
 #include "soundProcessing.h"
+#include "tracking.h"
 #include <cmath>
 #include <cstdint>
 
-float estimateLevel(char* buffer, int bufferLength){
+//TODO: Move these to a shared include
+const int BYTES_PER_CHANNEL = 2;
+const int NUM_CHANNELS = 4;
+
+//Don't move these, not used outside this file.
+const int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
+const int MIN_OFFSET = -MAX_OFFSET;
+
+float estimateLevel(char* buffer, unsigned int bufferLength){
   float total = 0.0f;
   unsigned int count = 0;
   //This assumes that the input format is S16_LE
-  for(int i = 0; i < bufferLength; i += 2){
+  for(int i = 0; i < bufferLength; i += BYTES_PER_CHANNEL){
     count++;
     float val = (float)*(int16_t*)(buffer + i);
     total += val*val;
@@ -35,4 +44,25 @@ float estimateLevel(char* buffer, int bufferLength){
 
   float avg = sqrt(total/count);
   return avg;
+}
+
+float diffWithOffset(char* buffer, unsigned int bufferLength,
+		     unsigned int ch1, unsigned int ch2,
+		     int offset){
+
+  unsigned int count = 0;
+  float total = 0.0f;
+
+  unsigned int frames = bufferLength/(BYTES_PER_CHANNEL*NUM_CHANNELS);
+  for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
+    count++;
+    
+    float val1 = (float)*(((int16_t*)buffer)+NUM_CHANNELS*i + ch1);
+    float val2 = (float)*(((int16_t*)buffer)+NUM_CHANNELS*(i+offset) + ch2);
+
+    total += (val1-val2)*(val1-val2);
+  }
+
+  float avg = total/count;
+  return sqrt(avg);
 }

@@ -21,5 +21,7 @@
 
 #pragma once
 
-float estimateLevel(char* buffer, int bufferLength);
-
+float estimateLevel(char* buffer, unsigned int bufferLength);
+float diffWithOffset(char* buffer, unsigned int bufferLength,
+		     unsigned int ch1, unsigned int ch2,
+		     int offset);
