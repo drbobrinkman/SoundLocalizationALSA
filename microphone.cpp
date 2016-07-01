@@ -2,9 +2,7 @@
 
 #include "microphone.h"
 
-Microphone::Microphone(int iTargetFrameRate) {
-  targetFrameRate = iTargetFrameRate;
-  
+Microphone::Microphone() {
   int rc;
   unsigned int val, val2;
   int dir;

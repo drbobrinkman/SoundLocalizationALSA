@@ -7,10 +7,24 @@
 //TODO: If I was a good person, I'd make this a singleton
 class Microphone {
  public:
-  Microphone(int iTargetFrameRate = 60);
-  ~Microphone();
+  static Microphone& getInstance(){
+    static Microphone instance;
+    return instance;
+  }
   
-  int targetFrameRate;
+ private:
+  //This is to make sure we don't try to make Microphones using new and
+  // delete
+  Microphone();
+  ~Microphone();
+
+ public:
+  //This is to make sure we don't forget to declare our variables
+  // as references
+  Microphone(Microphone const&) = delete;
+  void operator=(Microphone const&) = delete;
+  
+  static const int targetFrameRate = 60;
   
   snd_pcm_t *handle;
   snd_pcm_hw_params_t *params;

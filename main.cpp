@@ -5,7 +5,7 @@
 #include "tracking.h"
 
 int main() {
-  Microphone m;
+  Microphone& m = Microphone::getInstance();
 
   //Loop forever. Right now, must kill via ctrl-c
   while(true){
