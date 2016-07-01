@@ -27,3 +27,8 @@ float diffWithOffset(char* buffer, unsigned int bufferLength,
 		     int offset);
 int findBestOffset(char* buffer, unsigned int bufferLength,
 		   unsigned int ch1, unsigned int ch2);
+float diffWithOffsetPrecise(char* buffer, unsigned int bufferLength,
+		     unsigned int ch1, unsigned int ch2,
+		     float offset);
+float findBestOffsetPrecise(char* buffer, unsigned int bufferLength,
+		   unsigned int ch1, unsigned int ch2);
