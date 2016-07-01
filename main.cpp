@@ -4,7 +4,7 @@
 
 int main() {
   Microphone m;
-  std::cout << m.bufferSize << std::endl;
+  std::cout << (int)m.frames << std::endl;
   
   return 0;
 }

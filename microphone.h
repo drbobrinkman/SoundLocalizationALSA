@@ -15,7 +15,9 @@ class Microphone {
   snd_pcm_t *handle;
   snd_pcm_hw_params_t *params;
   snd_pcm_uframes_t frames;
-
+  const unsigned int BYTES_PER_FRAME = 8;
+  
   char* buffer;
-  int bufferSize;
+  //Note: Buffer size should be frames*8, because we are using
+  // 16-bit format with 4 channels
 };

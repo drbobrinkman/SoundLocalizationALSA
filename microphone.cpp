@@ -8,7 +8,6 @@ Microphone::Microphone(int iTargetFrameRate) {
   int rc;
   unsigned int val, val2;
   int dir;
-  snd_pcm_uframes_t frames;
 
   /* Open PCM device for playback. */
   rc = snd_pcm_open(&handle, "hw:1,0",
@@ -53,8 +52,8 @@ Microphone::Microphone(int iTargetFrameRate) {
   /*Get frame size after init */
   snd_pcm_hw_params_get_period_size(params,
 				    &frames, &dir);
-  bufferSize = frames*8; /* 2 bytes/samples, 4 channels */
-  buffer = (char *)malloc(bufferSize);
+  int size = frames*BYTES_PER_FRAME; /* 2 bytes/samples, 4 channels */
+  buffer = (char *)malloc(size);
 }
 
 Microphone::~Microphone(){
