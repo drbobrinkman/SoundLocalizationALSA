@@ -12,3 +12,5 @@ sla: $(OBJ)
 
 clean:
 	rm -f *.o *~ core
+
+default: sla
