@@ -2,6 +2,7 @@
 
 #include "microphone.h"
 #include "soundProcessing.h"
+#include "tracking.h"
 
 int main() {
   Microphone m;
@@ -22,6 +23,6 @@ int main() {
     }
     std::cout << std::endl;
   }
-  
+
   return 0;
 }
