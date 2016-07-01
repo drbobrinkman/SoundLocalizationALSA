@@ -27,7 +27,8 @@
 
 int main() {
   Microphone& m = Microphone::getInstance();
-
+  float offsets[4][4];
+  
   //Loop forever. Right now, must kill via ctrl-c
   while(true){
     int retVal;
@@ -38,9 +39,17 @@ int main() {
       throw std::string("microphone read failed: ") + snd_strerror(retVal);
     }
 
-    float l = estimateLevel(m.buffer, m.frames*m.BYTES_PER_FRAME);
+    /*float l = estimateLevel(m.buffer, m.frames*m.BYTES_PER_FRAME);
     for(int i=0; i<l; i+=100){
       std::cout << "=";
+    }
+    std::cout << std::endl;*/
+    for(int ch1 = 0; ch1 < 3; ch1++){
+      for(int ch2 = ch1+1; ch2 < 4; ch2++){
+	offsets[ch1][ch2] = findBestOffset(m.buffer, m.frames, ch1, ch2);
+      
+	std::cout << offsets[ch1][ch2] << " ";
+      }
     }
     std::cout << std::endl;
   }

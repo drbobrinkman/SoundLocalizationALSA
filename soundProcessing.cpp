@@ -46,14 +46,13 @@ float estimateLevel(char* buffer, unsigned int bufferLength){
   return avg;
 }
 
-float diffWithOffset(char* buffer, unsigned int bufferLength,
+float diffWithOffset(char* buffer, unsigned int frames,
 		     unsigned int ch1, unsigned int ch2,
 		     int offset){
 
   unsigned int count = 0;
   float total = 0.0f;
 
-  unsigned int frames = bufferLength/(BYTES_PER_CHANNEL*NUM_CHANNELS);
   for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
     count++;
     
@@ -65,4 +64,19 @@ float diffWithOffset(char* buffer, unsigned int bufferLength,
 
   float avg = total/count;
   return sqrt(avg);
+}
+
+int findBestOffset(char* buffer, unsigned int frames,
+		   unsigned int ch1, unsigned int ch2){
+  int bestOffset = MIN_OFFSET;
+  float bestVal = diffWithOffset(buffer, frames, ch1, ch2, bestOffset);
+  for(int offset=MIN_OFFSET+1; offset < MAX_OFFSET; offset++){
+    float val = diffWithOffset(buffer, frames, ch1, ch2, offset);
+    if(val < bestVal){
+      bestVal = val;
+      bestOffset = offset;
+    }
+  }
+
+  return bestOffset;
 }
