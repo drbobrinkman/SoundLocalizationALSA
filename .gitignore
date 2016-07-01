@@ -1,0 +1,11 @@
+#object files
+*.o
+
+#emacs temp files
+~*
+
+#the executable
+sla
+
+#junk space to hold sound files
+temp
