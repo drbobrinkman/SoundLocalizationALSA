@@ -162,3 +162,31 @@ float findBestOffsetPrecise(char* buffer, unsigned int frames,
   return bestOffset;
 }
 */
+
+float diffFourway(char* buffer, unsigned int frames,
+		  int offset[3]){
+  unsigned int count = 0;
+  float total = 0.0f;
+  float val[4];
+  
+  for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
+    count++;
+    
+    val[0] = (float)*(((int16_t*)buffer)+NUM_CHANNELS*i);
+    for(int j=1; j<4; j++){
+      val[j] = (float)*(((int16_t*)buffer)+NUM_CHANNELS*(i+offset[j-1])
+			      + j);
+    }
+
+    for(int ch1=0; ch1 < 3; ch1++){
+      for(int ch2=ch1+1; ch2 < 4; ch2++){
+	count++;
+	total += (val[ch1]-val[ch2])*(val[ch1]-val[ch2]);
+      }
+    }
+  }
+
+  float avg = total/count;
+  return sqrt(avg);
+  
+}

@@ -25,16 +25,15 @@
 #include <utility>
 
 float estimateLevel(char* buffer, unsigned int bufferLength);
-float diffWithOffset(char* buffer, unsigned int bufferLength,
+float diffWithOffset(char* buffer, unsigned int frames,
 		     unsigned int ch1, unsigned int ch2,
 		     int offset);
-int findBestOffset(char* buffer, unsigned int bufferLength,
-		   unsigned int ch1, unsigned int ch2);
-float diffWithOffsetPrecise(char* buffer, unsigned int bufferLength,
-		     unsigned int ch1, unsigned int ch2,
-		     float offset);
-float findBestOffsetPrecise(char* buffer, unsigned int bufferLength,
-		   unsigned int ch1, unsigned int ch2);
+//int findBestOffset(char* buffer, unsigned int frames,
+//		   unsigned int ch1, unsigned int ch2);
+
+float diffFourway(char* buffer, unsigned int frames,
+		  int offset[3]);
+
 void findTopNOffsets(char* buffer, unsigned int frames,
 	      unsigned int ch1, unsigned int ch2, int n,
 	      std::priority_queue<std::pair<float, int> >& outList);

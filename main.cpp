@@ -52,8 +52,9 @@ int main() {
     std::cout << std::fixed << std::setprecision(0)
     << std::setw(4) << l << " ";*/
     std::priority_queue<std::pair<float, int> > best[3];
-    findTopNOffsets(m.buffer.data(), m.frames, 0, 1, 3, best[0]);
-
+    for(int i=0; i<3; i++){
+      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 3, best[i]);
+    }
 
 
     //for(int ch1 = 0; ch1 < 3; ch1++){
