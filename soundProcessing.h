@@ -21,6 +21,9 @@
 
 #pragma once
 
+#include <queue>
+#include <utility>
+
 float estimateLevel(char* buffer, unsigned int bufferLength);
 float diffWithOffset(char* buffer, unsigned int bufferLength,
 		     unsigned int ch1, unsigned int ch2,
@@ -32,3 +35,6 @@ float diffWithOffsetPrecise(char* buffer, unsigned int bufferLength,
 		     float offset);
 float findBestOffsetPrecise(char* buffer, unsigned int bufferLength,
 		   unsigned int ch1, unsigned int ch2);
+void findTopNOffsets(char* buffer, unsigned int frames,
+	      unsigned int ch1, unsigned int ch2, int n,
+	      std::priority_queue<std::pair<float, int> >& outList);

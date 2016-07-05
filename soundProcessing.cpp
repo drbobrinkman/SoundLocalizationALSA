@@ -24,6 +24,8 @@
 #include <cmath>
 #include <cstdint>
 
+#include <iostream> //TODO: Remove when done debugging
+
 //TODO: Move these to a shared include
 constexpr int BYTES_PER_CHANNEL = 2;
 constexpr int NUM_CHANNELS = 4;
@@ -107,8 +109,42 @@ int findBestOffset(char* buffer, unsigned int frames,
     }
   }
 
+  //TODO: remove this debug print
+  if(ch1 == 0 && ch2 == 1){
+    for(int i=0; i<SIZE; i++){
+      std::cout << vals[i] << " ";
+    }
+    std::cout << std::endl << std::endl;
+  }
+  //END debug print
+  
   return bestOffset;
 }
+
+void findTopNOffsets(char* buffer, unsigned int frames,
+	      unsigned int ch1, unsigned int ch2, int n,
+	      std::priority_queue<std::pair<float, int> >& outList){
+  while(!outList.empty()){
+    outList.pop();
+  }
+
+  //Computer the first three, and put them in the heap
+  int i = 0;
+  for(; i < n && i < frames; i++){
+    int offset = MIN_OFFSET + i;
+    float val = diffWithOffset(buffer, frames, ch1, ch2, offset);
+    outList.push(std::make_pair(val, offset));
+  }
+
+  //Now make a new one, then pop the worse one, until done
+  for(; i < MAX_OFFSET - MIN_OFFSET; i++){
+    int offset = MIN_OFFSET + i;
+    float val = diffWithOffset(buffer, frames, ch1, ch2, offset);
+    outList.push(std::make_pair(val, offset));
+    outList.pop();
+  }
+}
+
 /*
 float findBestOffsetPrecise(char* buffer, unsigned int frames,
 		   unsigned int ch1, unsigned int ch2){
