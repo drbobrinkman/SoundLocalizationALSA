@@ -21,12 +21,14 @@
 
 #pragma once
 
-extern const float SENSOR_SPACING_INCHES;
-extern const int SAMPLES_PER_SECOND;
+constexpr float SENSOR_SPACING_INCHES = 7.0f;
+constexpr int SAMPLES_PER_SECOND = 16000;
 
-extern const float SPEED_OF_SOUND_SECONDS_PER_METER;
-extern const float METERS_PER_INCH;
-extern const float SPEED_OF_SOUND_SECONDS_PER_INCH;
+constexpr float SPEED_OF_SOUND_SECONDS_PER_METER = (float)(1.0/340.29);
+constexpr float METERS_PER_INCH = 0.0254f;
+constexpr float SPEED_OF_SOUND_SECONDS_PER_INCH = METERS_PER_INCH *
+  SPEED_OF_SOUND_SECONDS_PER_METER;
 
-extern const float SENSOR_SPACING_SAMPLES;
+constexpr float SENSOR_SPACING_SAMPLES = SENSOR_SPACING_INCHES *
+  SAMPLES_PER_SECOND * SPEED_OF_SOUND_SECONDS_PER_INCH;
 

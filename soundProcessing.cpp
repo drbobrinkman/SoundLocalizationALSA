@@ -25,13 +25,14 @@
 #include <cstdint>
 
 //TODO: Move these to a shared include
-const int BYTES_PER_CHANNEL = 2;
-const int NUM_CHANNELS = 4;
+constexpr int BYTES_PER_CHANNEL = 2;
+constexpr int NUM_CHANNELS = 4;
 
 //Don't move these, not used outside this file.
-const int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
-const int MIN_OFFSET = -MAX_OFFSET;
-const float PRECISION = 0.25;
+constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
+constexpr int MIN_OFFSET = -MAX_OFFSET;
+constexpr float PRECISION = 0.25;
+constexpr int SIZE = MAX_OFFSET - MIN_OFFSET;
 
 float estimateLevel(char* buffer, unsigned int bufferLength){
   float total = 0.0f;
@@ -66,6 +67,7 @@ float diffWithOffset(char* buffer, unsigned int frames,
   return sqrt(avg);
 }
 
+/*
 float diffWithOffsetPrecise(char* buffer, unsigned int frames,
 		     unsigned int ch1, unsigned int ch2,
 		     float foffset){
@@ -88,22 +90,26 @@ float diffWithOffsetPrecise(char* buffer, unsigned int frames,
   float avg = total/count;
   return sqrt(avg);
 }
+*/
 
 int findBestOffset(char* buffer, unsigned int frames,
 		   unsigned int ch1, unsigned int ch2){
+  static float vals[SIZE];
+  
   int bestOffset = MIN_OFFSET;
   float bestVal = diffWithOffset(buffer, frames, ch1, ch2, bestOffset);
   for(int offset=MIN_OFFSET+1; offset < MAX_OFFSET; offset++){
-    float val = diffWithOffset(buffer, frames, ch1, ch2, offset);
-    if(val < bestVal){
-      bestVal = val;
+    vals[offset - MIN_OFFSET]= diffWithOffset(buffer, frames, ch1, ch2,
+					      offset);
+    if(vals[offset - MIN_OFFSET] < bestVal){
+      bestVal = vals[offset - MIN_OFFSET];
       bestOffset = offset;
     }
   }
 
   return bestOffset;
 }
-
+/*
 float findBestOffsetPrecise(char* buffer, unsigned int frames,
 		   unsigned int ch1, unsigned int ch2){
   float bestOffset = MIN_OFFSET;
@@ -119,3 +125,4 @@ float findBestOffsetPrecise(char* buffer, unsigned int frames,
 
   return bestOffset;
 }
+*/
