@@ -77,10 +77,9 @@ Microphone::Microphone() {
   snd_pcm_hw_params_get_period_size(params,
 				    &frames, &dir);
   int size = frames*BYTES_PER_FRAME; /* 2 bytes/samples, 4 channels */
-  buffer = (char *)malloc(size);
+  buffer.resize(size, 0);
 }
 
 Microphone::~Microphone(){
   snd_pcm_close(handle);
-  free(buffer);
 }

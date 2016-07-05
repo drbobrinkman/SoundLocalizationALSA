@@ -31,6 +31,8 @@
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 
+#include <vector>
+
 class Microphone {
  public:
   static Microphone& getInstance(){
@@ -57,7 +59,7 @@ class Microphone {
   snd_pcm_uframes_t frames;
   const unsigned int BYTES_PER_FRAME = 8;
   
-  char* buffer;
+  std::vector<char> buffer;
   //Note: Buffer size should be frames*8, because we are using
   // 16-bit format with 4 channels
 };
