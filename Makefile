@@ -19,15 +19,17 @@
 
 CPP=g++
 CFLAGS=-std=c++14
+DBGFLAGS=-g -O0
+PRODFLAGS=-O3
 LIBS=-lasound
 DEPS = microphone.h soundProcessing.h tracking.h
 OBJ = main.o microphone.o soundProcessing.o tracking.o
 
 %.o: %.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
 
 sla: $(OBJ)
-	g++ -o $@ $^ $(CFLAGS) $(LIBS)
+	g++ -o $@ $^ $(CFLAGS) $(PRODFLAGS) $(LIBS)
 
 clean:
 	rm -f *.o *~ core
