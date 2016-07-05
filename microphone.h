@@ -31,7 +31,6 @@
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 
-//TODO: If I was a good person, I'd make this a singleton
 class Microphone {
  public:
   static Microphone& getInstance(){
