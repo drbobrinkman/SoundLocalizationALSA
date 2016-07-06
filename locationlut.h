@@ -27,6 +27,12 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <tuple>
+#include <functional>
+
+#include "tracking.h"
+
 class LocationLUT {
  public:
   static LocationLUT& getInstance(){
@@ -38,11 +44,39 @@ class LocationLUT {
   //This is to make sure we don't try to make LocationLUTs using new and
   // delete
   LocationLUT();
-  ~LocationLUT();
+
+  void buildLUT();
+  void loadLUT();
+  void saveLUT();
 
  public:
   //This is to make sure we don't forget to declare our variables
   // as references
   LocationLUT(LocationLUT const&) = delete;
   void operator=(LocationLUT const&) = delete;
+
+  std::tuple<float, float, float> get(std::tuple<int, int, int>);
+  
+ private:
+  /**
+   * Lookup table. Given three offsets (01, 02, and 03),
+   * return the x, y, and z coordinates of the likely source, in meters
+   **/
+  typedef std::tuple<int, int, int> key_t;
+
+  struct key_hash : public std::unary_function<key_t, std::size_t> {
+    std::size_t operator()(const key_t& k) const {
+      std::hash<long> long_hash; //TODO: Performance?
+  
+      long size = MAX_OFFSET - MIN_OFFSET;
+      long val = std::get<0>(k) - MIN_OFFSET;
+      val = val*size + (std::get<1>(k) - MIN_OFFSET);
+      val = val*size + (std::get<2>(k) - MIN_OFFSET);
+      return long_hash(val);
+    }
+  };
+  
+  std::unordered_map<std::tuple<int, int, int>,
+    std::tuple<float, float, float, int>,
+    key_hash> lut;
 };

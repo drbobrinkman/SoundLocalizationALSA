@@ -86,7 +86,14 @@ int main() {
 	}
       }
     }
-  }
 
+    //Now do a LUT lookup
+    std::tuple<float, float, float> entry =
+      lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
+			      offsets[2][bestk]));
+    std::cout << "(" << std::get<0>(entry) << ", "
+	      << std::get<1>(entry) << ", "
+	      << std::get<2>(entry) << ")" << std::endl;
+  }
   return 0;
 }
