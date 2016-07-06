@@ -32,7 +32,7 @@ int main() {
   float foffsets[4][4];
   
   //Loop forever. Right now, must kill via ctrl-c
-  for(int j=0; j<60*10; j++){
+  for(int j=0; j<60*5; j++){
     int retVal;
 
     //Should block if data not yet ready
@@ -41,7 +41,14 @@ int main() {
       throw std::string("microphone read failed: ") + snd_strerror(retVal);
     }
 
-    float l = estimateLevel(m.buffer.data(), m.frames*m.BYTES_PER_FRAME);
+    std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer.data(),
+					  m.frames*m.BYTES_PER_FRAME);
+
+    std::cout.write(m.buffer.data(), m.frames*m.BYTES_PER_FRAME);
+    /*for(int i=0; i<NUM_CHANNELS; i++){
+      std::cout << "(" << l[i].first << ", " << l[i].second << ") ";
+    }
+    std::cout << std::endl;*/
     /*    int i=0;
     for(; i<l; i+=100){
             std::cout << "=";
@@ -51,12 +58,31 @@ int main() {
     }
     std::cout << std::fixed << std::setprecision(0)
     << std::setw(4) << l << " ";*/
-    std::priority_queue<std::pair<float, int> > best[3];
+    /*std::priority_queue<std::pair<float, int> > best[3];
     for(int i=0; i<3; i++){
-      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 3, best[i]);
+      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 5, best[i]);
+    }
+    int offsets[3][5];
+    for(int i=0; i<3; i++){
+      for(int j=0; j<5; j++){
+	offsets[i][j] = best[i].top().second;
+	best[i].pop();
+      }
     }
 
-
+    for(int i=0; i<5; i++){
+      for(int j=0; j<5; j++){
+	for(int k=0; k<5; k++){
+	  int tryOffsets[3] = {offsets[0][i], offsets[1][j], offsets[2][k]};
+	  std::cout << std::setprecision(2)
+		    << diffFourway(m.buffer.data(), m.frames, tryOffsets)
+		    << ", ";
+	}
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl; 
+    */
     //for(int ch1 = 0; ch1 < 3; ch1++){
       //for(int ch2 = ch1+1; ch2 < 4; ch2++){
 	

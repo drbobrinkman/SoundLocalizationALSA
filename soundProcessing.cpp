@@ -26,28 +26,35 @@
 
 #include <iostream> //TODO: Remove when done debugging
 
-//TODO: Move these to a shared include
-constexpr int BYTES_PER_CHANNEL = 2;
-constexpr int NUM_CHANNELS = 4;
-
 //Don't move these, not used outside this file.
 constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
 constexpr int MIN_OFFSET = -MAX_OFFSET;
 constexpr float PRECISION = 0.25;
 constexpr int SIZE = MAX_OFFSET - MIN_OFFSET;
 
-float estimateLevel(char* buffer, unsigned int bufferLength){
-  float total = 0.0f;
-  unsigned int count = 0;
+std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer, unsigned int bufferLength){
+  float total[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+  float totalSq[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+  unsigned int count[4] = {0, 0, 0, 0};
   //This assumes that the input format is S16_LE
+
+  int channel = 0;
   for(int i = 0; i < bufferLength; i += BYTES_PER_CHANNEL){
-    count++;
+    count[channel]++;
     float val = (float)*(int16_t*)(buffer + i);
-    total += val*val;
+    total[channel] += val;
+    totalSq[channel] += val*val;
+    channel = (channel+1)%4;
   }
 
-  float avg = sqrt(total/count);
-  return avg;
+  std::vector<std::pair<float, float> > ret;
+  ret.resize(NUM_CHANNELS);
+  for(int i=0; i < NUM_CHANNELS; i++){
+    float avg = total[i]/count[i];
+    ret[i] = std::make_pair(avg, (float)sqrt(totalSq[i]/count[i] - avg*avg));
+  }
+  return ret;
 }
 
 float diffWithOffset(char* buffer, unsigned int frames,
