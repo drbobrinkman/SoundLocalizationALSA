@@ -22,8 +22,8 @@ CFLAGS=-std=c++14
 DBGFLAGS=-g -O0
 PRODFLAGS=-O3
 LIBS=-lasound
-DEPS = microphone.h soundProcessing.h tracking.h
-OBJ = main.o microphone.o soundProcessing.o tracking.o
+DEPS = microphone.h soundProcessing.h tracking.h locationlut.h
+OBJ = main.o microphone.o soundProcessing.o tracking.o locationlut.o
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)

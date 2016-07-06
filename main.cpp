@@ -23,13 +23,13 @@
 #include <iomanip>
 
 #include "microphone.h"
-//#include "locationlut.h"
+#include "locationlut.h"
 #include "soundProcessing.h"
 #include "tracking.h"
 
 int main() {
   Microphone& m = Microphone::getInstance();
-  //LocationLUT& lut = LocationLut::getInstance();
+  LocationLUT& lut = LocationLUT::getInstance();
   
   //Loop forever. Right now, must kill via ctrl-c
   for(int j=0; j<60*10; j++){

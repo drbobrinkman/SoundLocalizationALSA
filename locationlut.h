@@ -19,21 +19,30 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
+/**
+ * Portions of this code come from http://www.linuxjournal.com/node/6735/print
+ * Tranter, Jeff. "Introduction to Sound Programming with ALSA." Linux Journal,
+ *  Sep 30, 2004.
+ **/
+
 #pragma once
 
-constexpr float SENSOR_SPACING_INCHES = 7.0f;
-constexpr int SAMPLES_PER_SECOND = 16000;
+class LocationLUT {
+ public:
+  static LocationLUT& getInstance(){
+    static LocationLUT instance;
+    return instance;
+  }
+  
+ private:
+  //This is to make sure we don't try to make LocationLUTs using new and
+  // delete
+  LocationLUT();
+  ~LocationLUT();
 
-constexpr float SPEED_OF_SOUND_SECONDS_PER_METER = (float)(1.0/340.29);
-constexpr float METERS_PER_INCH = 0.0254f;
-constexpr float SPEED_OF_SOUND_SECONDS_PER_INCH = METERS_PER_INCH *
-  SPEED_OF_SOUND_SECONDS_PER_METER;
-
-constexpr float SENSOR_SPACING_SAMPLES = SENSOR_SPACING_INCHES *
-  SAMPLES_PER_SECOND * SPEED_OF_SOUND_SECONDS_PER_INCH;
-
-constexpr float SPEED_OF_SOUND_SAMPLES_PER_METER = SAMPLES_PER_SECOND *
-  SPEED_OF_SOUND_SECONDS_PER_METER;
-
-constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
-constexpr int MIN_OFFSET = -MAX_OFFSET;
+ public:
+  //This is to make sure we don't forget to declare our variables
+  // as references
+  LocationLUT(LocationLUT const&) = delete;
+  void operator=(LocationLUT const&) = delete;
+};

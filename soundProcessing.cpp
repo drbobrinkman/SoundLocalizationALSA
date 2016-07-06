@@ -28,10 +28,6 @@
 
 #include <iostream>
 
-//Don't move these, not used outside this file.
-constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
-constexpr int MIN_OFFSET = -MAX_OFFSET;
-constexpr float PRECISION = 0.25;
 constexpr int SIZE = MAX_OFFSET - MIN_OFFSET;
 
 std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer,
