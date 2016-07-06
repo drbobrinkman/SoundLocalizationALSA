@@ -33,7 +33,8 @@
 
 #include <vector>
 
-constexpr unsigned int BYTES_PER_FRAME = 8;
+constexpr int BYTES_PER_CHANNEL = 2;
+constexpr int NUM_CHANNELS = 4;
 
 class Microphone {
  public:

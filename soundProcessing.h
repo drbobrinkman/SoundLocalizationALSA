@@ -25,11 +25,8 @@
 #include <utility>
 #include <vector>
 
-constexpr int BYTES_PER_CHANNEL = 2;
-constexpr int NUM_CHANNELS = 4;
-
 std::vector<std::pair<float, float> >
-  meansAndStdDevs(char* buffer, unsigned int bufferLength);
+  meansAndStdDevs(char* buffer, unsigned int frames);
 float diffWithOffset(char* buffer, unsigned int frames,
 		     unsigned int ch1, unsigned int ch2,
 		     int offset);

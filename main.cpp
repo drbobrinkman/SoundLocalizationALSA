@@ -44,7 +44,7 @@ int main() {
 
     //Next, calculate mean and stdev for rescaling and centering signals
     std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer.data(),
-					  m.frames*BYTES_PER_FRAME);
+					  m.frames);
 
     //Then rescale and recenter
     recenterAndRescale(m.buffer.data(), m.frames, l);
@@ -62,18 +62,22 @@ int main() {
     }
     std::cout << std::fixed << std::setprecision(0)
     << std::setw(4) << l << " ";*/
-    /*std::priority_queue<std::pair<float, int> > best[3];
+    std::priority_queue<std::pair<float, int> > best[3];
     for(int i=0; i<3; i++){
-      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 5, best[i]);
+      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 3, best[i]);
     }
-    int offsets[3][5];
+    int offsets[3][3];
     for(int i=0; i<3; i++){
-      for(int j=0; j<5; j++){
+      for(int j=0; j<3; j++){
 	offsets[i][j] = best[i].top().second;
+	std::cout << "(" << best[i].top().first << ", "
+		  << best[i].top().second << ") ";
 	best[i].pop();
       }
+      std::cout << std::endl;
     }
-
+    std::cout << std::endl;
+    /*
     for(int i=0; i<5; i++){
       for(int j=0; j<5; j++){
 	for(int k=0; k<5; k++){
@@ -86,17 +90,18 @@ int main() {
       std::cout << std::endl;
     }
     std::cout << std::endl; 
-    */
+    
     //for(int ch1 = 0; ch1 < 3; ch1++){
       //for(int ch2 = ch1+1; ch2 < 4; ch2++){
 	
 	//offsets[ch1][ch2] = findBestOffset(m.buffer.data(), m.frames, ch1,
 	//				   ch2);
 
-	//std::cout << std::setw(3) << offsets[ch1][ch2] /*<< ", " << std::setw(6) << foffsets[ch1][ch2] */ << " ";
+	//std::cout << std::setw(3) << offsets[ch1][ch2] /*<< ", " << std::setw(6) << foffsets[ch1][ch2]  << " ";
     // }
     //}
     //std::cout << std::endl;
+    */
   }
 
   return 0;

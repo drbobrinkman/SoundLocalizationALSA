@@ -34,7 +34,8 @@ constexpr int MIN_OFFSET = -MAX_OFFSET;
 constexpr float PRECISION = 0.25;
 constexpr int SIZE = MAX_OFFSET - MIN_OFFSET;
 
-std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer, unsigned int bufferLength){
+std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer,
+						      unsigned int frames){
   float total[4] = {0.0f, 0.0f, 0.0f, 0.0f};
   float totalSq[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -42,7 +43,7 @@ std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer, unsigned int
   //This assumes that the input format is S16_LE
 
   int channel = 0;
-  for(int i = 0; i < bufferLength; i += BYTES_PER_CHANNEL){
+  for(int i = 0; i < frames*NUM_CHANNELS*BYTES_PER_CHANNEL; i += BYTES_PER_CHANNEL){
     count[channel]++;
     float val = (float)*(int16_t*)(buffer + i);
     total[channel] += val;
