@@ -21,10 +21,12 @@
 
 #include "soundProcessing.h"
 #include "tracking.h"
+#include "microphone.h"
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
-#include <iostream> //TODO: Remove when done debugging
+#include <iostream>
 
 //Don't move these, not used outside this file.
 constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
@@ -76,31 +78,6 @@ float diffWithOffset(char* buffer, unsigned int frames,
   return sqrt(avg);
 }
 
-/*
-float diffWithOffsetPrecise(char* buffer, unsigned int frames,
-		     unsigned int ch1, unsigned int ch2,
-		     float foffset){
-  unsigned int count = 0;
-  float total = 0.0f;
-  int offset = (int)foffset;
-  float remainder = foffset - offset;
-  
-  for(int i=MAX_OFFSET; i < frames-MAX_OFFSET-1; i++){
-    count++;
-    
-    float val1 = (float)*(((int16_t*)buffer)+NUM_CHANNELS*i + ch1);
-    float val2a = (float)*(((int16_t*)buffer)+NUM_CHANNELS*(i+offset) + ch2);
-    float val2b = (float)*(((int16_t*)buffer)+NUM_CHANNELS*(i+offset+1) + ch2);
-    float val2 = (1.0-remainder)*val2a + remainder*val2b;
-    
-    total += (val1-val2)*(val1-val2);
-  }
-
-  float avg = total/count;
-  return sqrt(avg);
-}
-*/
-
 int findBestOffset(char* buffer, unsigned int frames,
 		   unsigned int ch1, unsigned int ch2){
   static float vals[SIZE];
@@ -116,15 +93,6 @@ int findBestOffset(char* buffer, unsigned int frames,
     }
   }
 
-  //TODO: remove this debug print
-  if(ch1 == 0 && ch2 == 1){
-    for(int i=0; i<SIZE; i++){
-      std::cout << vals[i] << " ";
-    }
-    std::cout << std::endl << std::endl;
-  }
-  //END debug print
-  
   return bestOffset;
 }
 
@@ -152,24 +120,6 @@ void findTopNOffsets(char* buffer, unsigned int frames,
   }
 }
 
-/*
-float findBestOffsetPrecise(char* buffer, unsigned int frames,
-		   unsigned int ch1, unsigned int ch2){
-  float bestOffset = MIN_OFFSET;
-  float bestVal = diffWithOffsetPrecise(buffer, frames, ch1, ch2, bestOffset);
-  for(float offset=MIN_OFFSET+PRECISION; offset < MAX_OFFSET;
-      offset += PRECISION){
-    float val = diffWithOffsetPrecise(buffer, frames, ch1, ch2, offset);
-    if(val < bestVal){
-      bestVal = val;
-      bestOffset = offset;
-    }
-  }
-
-  return bestOffset;
-}
-*/
-
 float diffFourway(char* buffer, unsigned int frames,
 		  int offset[3]){
   unsigned int count = 0;
@@ -196,4 +146,31 @@ float diffFourway(char* buffer, unsigned int frames,
   float avg = total/count;
   return sqrt(avg);
   
+}
+
+void recenterAndRescale(char* buffer, unsigned int frames,
+			std::vector<std::pair<float, float> > stats){
+  float scale[NUM_CHANNELS] = {1.0f, 1.0f, 1.0f, 1.0f};
+  float amax = stats[0].second;
+  for(int i=1; i<NUM_CHANNELS; i++){
+    amax = std::max(amax, stats[i].second); 
+  }
+  
+  for(int i=0; i<NUM_CHANNELS; i++){
+    //If the stdev is less than 1.0f, something went really wrong. Mics
+    // are noisier than that.
+    if(stats[i].second > 0.0f){
+      scale[i] = amax/stats[i].second;
+    }
+  }
+  
+  for(int i=0; i<frames; i++){
+    for(int j=0; j<NUM_CHANNELS; j++){
+      int offset = i*NUM_CHANNELS + j;
+      float val = (float)*(((int16_t*)buffer)+offset);
+      val = val - stats[j].first;
+      val = val*scale[j];
+      *(((int16_t*)buffer)+offset) = (int16_t)(val+0.5);
+    }
+  }
 }

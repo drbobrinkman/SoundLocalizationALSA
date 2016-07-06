@@ -33,6 +33,8 @@
 
 #include <vector>
 
+constexpr unsigned int BYTES_PER_FRAME = 8;
+
 class Microphone {
  public:
   static Microphone& getInstance(){
@@ -57,7 +59,6 @@ class Microphone {
   snd_pcm_t *handle;
   snd_pcm_hw_params_t *params;
   snd_pcm_uframes_t frames;
-  const unsigned int BYTES_PER_FRAME = 8;
   
   std::vector<char> buffer;
   //Note: Buffer size should be frames*8, because we are using

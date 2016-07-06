@@ -35,16 +35,20 @@ int main() {
   for(int j=0; j<60*5; j++){
     int retVal;
 
+    //First, read data
     //Should block if data not yet ready
     retVal = snd_pcm_readi(m.handle, m.buffer.data(), m.frames);
     if(retVal < 0){
       throw std::string("microphone read failed: ") + snd_strerror(retVal);
     }
 
+    //Next, calculate mean and stdev for rescaling and centering signals
     std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer.data(),
-					  m.frames*m.BYTES_PER_FRAME);
+					  m.frames*BYTES_PER_FRAME);
 
-    std::cout.write(m.buffer.data(), m.frames*m.BYTES_PER_FRAME);
+    //Then rescale and recenter
+    recenterAndRescale(m.buffer.data(), m.frames, l);
+
     /*for(int i=0; i<NUM_CHANNELS; i++){
       std::cout << "(" << l[i].first << ", " << l[i].second << ") ";
     }
