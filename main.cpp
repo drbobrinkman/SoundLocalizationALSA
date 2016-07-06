@@ -87,6 +87,17 @@ int main() {
       }
     }
 
+    float loudness = l[0].second;
+    for(int i=1; i<4; i++){
+      loudness = std::max(loudness, l[i].second);
+    }
+    int i=0;
+    for(;i<loudness;i+=100){
+      std::cout << "=";
+    }
+    for(;i<1500;i+=100){
+      std::cout << " ";
+    }
     //Now do a LUT lookup
     std::tuple<float, float, float> entry =
       lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],

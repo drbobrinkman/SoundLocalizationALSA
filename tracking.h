@@ -38,3 +38,6 @@ constexpr float SPEED_OF_SOUND_SAMPLES_PER_METER = SAMPLES_PER_SECOND *
 
 constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
 constexpr int MIN_OFFSET = -MAX_OFFSET;
+
+constexpr float SIN_60 = 0.86602540378f;
+constexpr float TAN_60 = 1.73205080757f;
