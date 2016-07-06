@@ -23,16 +23,16 @@
 #include <iomanip>
 
 #include "microphone.h"
+//#include "locationlut.h"
 #include "soundProcessing.h"
 #include "tracking.h"
 
 int main() {
   Microphone& m = Microphone::getInstance();
-  float offsets[4][4];
-  float foffsets[4][4];
+  //LocationLUT& lut = LocationLut::getInstance();
   
   //Loop forever. Right now, must kill via ctrl-c
-  for(int j=0; j<60*5; j++){
+  for(int j=0; j<60*10; j++){
     int retVal;
 
     //First, read data
@@ -46,62 +46,46 @@ int main() {
     std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer.data(),
 					  m.frames);
 
-    //Then rescale and recenter
+    //Then rescale and recenter each signal, so all have
+    // mean of 0, and same stdev as loudest signal
     recenterAndRescale(m.buffer.data(), m.frames, l);
 
-    /*for(int i=0; i<NUM_CHANNELS; i++){
-      std::cout << "(" << l[i].first << ", " << l[i].second << ") ";
-    }
-    std::cout << std::endl;*/
-    /*    int i=0;
-    for(; i<l; i+=100){
-            std::cout << "=";
-    }
-    for(; i<1500; i+=100){
-        std::cout << " ";
-    }
-    std::cout << std::fixed << std::setprecision(0)
-    << std::setw(4) << l << " ";*/
+    //Find the top 5 possible offsets for each subordinate channel
+    // with the lead channel. TODO: Make the loudest channel the lead
+    // channel. Right now it is just hard-coded to channel 0.
     std::priority_queue<std::pair<float, int> > best[3];
     for(int i=0; i<3; i++){
-      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 3, best[i]);
+      findTopNOffsets(m.buffer.data(), m.frames, 0, i+1, 5, best[i]);
     }
-    int offsets[3][3];
+
+    //Prep the data to be passed to the diffFourWay.
+    int offsets[3][5];
     for(int i=0; i<3; i++){
-      for(int j=0; j<3; j++){
+      for(int j=0; j<5; j++){
 	offsets[i][j] = best[i].top().second;
-	std::cout << "(" << best[i].top().first << ", "
-		  << best[i].top().second << ") ";
 	best[i].pop();
       }
-      std::cout << std::endl;
     }
-    std::cout << std::endl;
-    /*
+
+    //Now do a four-way alignment on the 5^3 candidate offsets
+    int besti = -1;
+    int bestj = -1;
+    int bestk = -1;
+    float bestDiff = 1000000.0f;
     for(int i=0; i<5; i++){
       for(int j=0; j<5; j++){
 	for(int k=0; k<5; k++){
 	  int tryOffsets[3] = {offsets[0][i], offsets[1][j], offsets[2][k]};
-	  std::cout << std::setprecision(2)
-		    << diffFourway(m.buffer.data(), m.frames, tryOffsets)
-		    << ", ";
+	  float diff = diffFourway(m.buffer.data(), m.frames, tryOffsets);
+	  if(diff < bestDiff || besti == -1){
+	    besti = i;
+	    bestj = j;
+	    bestk = k;
+	    bestDiff = diff;
+	  }
 	}
       }
-      std::cout << std::endl;
     }
-    std::cout << std::endl; 
-    
-    //for(int ch1 = 0; ch1 < 3; ch1++){
-      //for(int ch2 = ch1+1; ch2 < 4; ch2++){
-	
-	//offsets[ch1][ch2] = findBestOffset(m.buffer.data(), m.frames, ch1,
-	//				   ch2);
-
-	//std::cout << std::setw(3) << offsets[ch1][ch2] /*<< ", " << std::setw(6) << foffsets[ch1][ch2]  << " ";
-    // }
-    //}
-    //std::cout << std::endl;
-    */
   }
 
   return 0;

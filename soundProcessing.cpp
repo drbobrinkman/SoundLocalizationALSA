@@ -130,10 +130,11 @@ float diffFourway(char* buffer, unsigned int frames,
   for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
     count++;
     
-    val[0] = (float)*(((int16_t*)buffer)+NUM_CHANNELS*i);
+    val[0] = (float)*(((int16_t*)buffer)
+		      +(NUM_CHANNELS*i));
     for(int j=1; j<4; j++){
-      val[j] = (float)*(((int16_t*)buffer)+NUM_CHANNELS*(i+offset[j-1])
-			      + j);
+      val[j] = (float)*(((int16_t*)buffer)
+			+(NUM_CHANNELS*(i+offset[j-1]) + j));
     }
 
     for(int ch1=0; ch1 < 3; ch1++){
