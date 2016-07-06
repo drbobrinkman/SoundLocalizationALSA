@@ -69,8 +69,8 @@ float diffWithOffset(char* buffer, unsigned int frames,
   for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
     count++;
     
-    float val1 = (float)*(((int16_t*)buffer)+NUM_CHANNELS*i + ch1);
-    float val2 = (float)*(((int16_t*)buffer)+NUM_CHANNELS*(i+offset) + ch2);
+    float val1 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*i + ch1));
+    float val2 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+offset) + ch2));
 
     total += (val1-val2)*(val1-val2);
   }
