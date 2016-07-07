@@ -28,8 +28,9 @@
 #include "tracking.h"
 
 int main() {
-  Microphone& m = Microphone::getInstance();
+  //Build the LUT before opening the mic
   LocationLUT& lut = LocationLUT::getInstance();
+  Microphone& m = Microphone::getInstance();
   
   //Loop forever. Right now, must kill via ctrl-c
   for(int j=0; j<60*10; j++){
