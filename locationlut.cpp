@@ -23,6 +23,7 @@
 #include "microphone.h"
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <cmath>
 
@@ -36,7 +37,8 @@ std::vector<std::vector<float> > MIC_LOCATIONS =
   };
 
 constexpr float RANGE = 5.0f;
-constexpr float PRECISION = 0.11f;
+constexpr float PRECISION = 0.01f;
+constexpr char FNAME[] = "lut.csv";
 
 float dist(std::vector<float> pt1, std::vector<float> pt2){
   float val = 0.0f;
@@ -71,27 +73,64 @@ void LocationLUT::buildLUT(){
 	  lut.insert(std::make_pair(offsets, std::make_tuple(x, y, z, 1)));
 	} else {
 	  std::tuple<float, float, float, int>& entry = lut.at(offsets);
-	  std::get<0>(entry) += x;
-	  std::get<1>(entry) += y;
-	  std::get<2>(entry) += z;
+	  std::get<0>(entry) += x*PRECISION;
+	  std::get<1>(entry) += y*PRECISION;
+	  std::get<2>(entry) += z*PRECISION;
 	  std::get<3>(entry) += 1;
 	}
       }
     }
   }
-  std::cout << "lut size: " << lut.size() << std::endl;
 }
 
 void LocationLUT::loadLUT(){
-  //TODO: Load LUT from disk here
+  std::ifstream infile(FNAME);
+  if(infile.is_open()){
+    std::cout << "loading LUT" << std::endl;
+    float floats[3];
+    int ints[4];
+    char eatcomma;
+    int count;
+
+    infile >> count;
+
+    for(int i=0; i<count; i++){
+      infile >> ints[0] >> eatcomma
+	     >> ints[1] >> eatcomma
+	     >> ints[2] >> eatcomma
+	     >> floats[0] >> eatcomma
+	     >> floats[1] >> eatcomma
+	     >> floats[2] >> eatcomma
+	     >> ints[3];
+      lut.insert(std::make_pair(std::make_tuple(ints[0], ints[1], ints[2]),
+				std::make_tuple(floats[0], floats[1],
+						floats[2], ints[3])));
+    }
+  }
+  std::cout << "lut size, loaded: " << lut.size() << std::endl;
+
   if(lut.size() == 0){
     buildLUT();
     saveLUT();
   }
+  std::cout << "lut size, built: " << lut.size() << std::endl;
+
 }
 
 void LocationLUT::saveLUT(){
-  //TODO: Save LUT to disk here
+  std::ofstream outfile(FNAME);
+  std::cout << "saving LUT" << std::endl;
+
+  outfile << lut.size() << std::endl;
+  for(auto it=lut.begin(); it!=lut.end(); ++it){
+    outfile << std::get<0>(it->first) << ", "
+	    << std::get<1>(it->first) << ", "
+	    << std::get<2>(it->first) << ", "
+	    << std::get<0>(it->second) << ", "
+	    << std::get<1>(it->second) << ", "
+	    << std::get<2>(it->second) << ", "
+	    << std::get<3>(it->second) << std::endl;
+  }
 }
 
 LocationLUT::LocationLUT(){
