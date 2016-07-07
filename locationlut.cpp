@@ -36,7 +36,7 @@ std::vector<std::vector<float> > MIC_LOCATIONS =
   };
 
 constexpr float RANGE = 5.0f;
-constexpr float PRECISION = 0.01f;
+constexpr float PRECISION = 0.11f;
 
 float dist(std::vector<float> pt1, std::vector<float> pt2){
   float val = 0.0f;
@@ -61,11 +61,12 @@ std::tuple<int, int, int> offsetsForLocation(float x, float y, float z){
 }
 
 void LocationLUT::buildLUT(){
-  for(float z = -RANGE; z < RANGE; z += PRECISION){
+  for(int z = -RANGE/PRECISION; z < RANGE/PRECISION; z++){
     std::cout << "z == " << z << std::endl;
-    for(float y = -RANGE; y < RANGE; y += PRECISION){
-      for(float x = -RANGE; x < RANGE; x += PRECISION){
-	std::tuple<int, int, int> offsets = offsetsForLocation(x, y, z);
+    for(int y = -RANGE/PRECISION; y < RANGE/PRECISION; y++){
+      for(int x = -RANGE/PRECISION; x < RANGE/PRECISION; x++){
+	std::tuple<int, int, int> offsets
+	  = offsetsForLocation(x*PRECISION, y*PRECISION, z*PRECISION);
 	if(lut.count(offsets) == 0){
 	  lut.insert(std::make_pair(offsets, std::make_tuple(x, y, z, 1)));
 	} else {
