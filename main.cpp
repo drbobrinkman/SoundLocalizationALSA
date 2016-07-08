@@ -100,7 +100,7 @@ int main() {
       std::cout << " ";
     }
     //Now do a LUT lookup
-    std::tuple<float, float, float> entry =
+    std::tuple<float, float, float, int> entry =
       lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
 			      offsets[2][bestk]));
     std::cout << "(" << std::get<0>(entry) << ", "

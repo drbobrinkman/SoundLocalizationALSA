@@ -30,8 +30,11 @@
 #include <unordered_map>
 #include <tuple>
 #include <functional>
+#include <vector>
 
 #include "tracking.h"
+
+constexpr float LUT_KEY_PREC = 10.0f;
 
 class LocationLUT {
  public:
@@ -55,28 +58,28 @@ class LocationLUT {
   LocationLUT(LocationLUT const&) = delete;
   void operator=(LocationLUT const&) = delete;
 
-  std::tuple<float, float, float> get(std::tuple<int, int, int>);
+  std::tuple<float, float, float, int> get(std::tuple<float, float, float>);
   
  private:
   /**
    * Lookup table. Given three offsets (01, 02, and 03),
    * return the x, y, and z coordinates of the likely source, in meters
    **/
-  typedef std::tuple<int, int, int> key_t;
+  typedef std::tuple<float, float, float> key_t;
 
   struct key_hash : public std::unary_function<key_t, std::size_t> {
     std::size_t operator()(const key_t& k) const {
       std::hash<long> long_hash; //TODO: Performance?
   
-      long size = MAX_OFFSET - MIN_OFFSET;
-      long val = std::get<0>(k) - MIN_OFFSET;
-      val = val*size + (std::get<1>(k) - MIN_OFFSET);
-      val = val*size + (std::get<2>(k) - MIN_OFFSET);
+      long size = LUT_KEY_PREC*(MAX_OFFSET - MIN_OFFSET);
+      long val = LUT_KEY_PREC*std::get<0>(k) - LUT_KEY_PREC*MIN_OFFSET;
+      val = val*size + (LUT_KEY_PREC*std::get<1>(k) - LUT_KEY_PREC*MIN_OFFSET);
+      val = val*size + (LUT_KEY_PREC*std::get<2>(k) - LUT_KEY_PREC*MIN_OFFSET);
       return long_hash(val);
     }
   };
   
-  std::unordered_map<std::tuple<int, int, int>,
+  std::unordered_map<std::tuple<float, float, float>,
     std::tuple<float, float, float, int>,
     key_hash> lut;
 };
