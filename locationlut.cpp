@@ -37,7 +37,7 @@ std::vector<std::vector<float> > MIC_LOCATIONS =
     {0.0f, 0.0f, SENSOR_SPACING_METERS}  //Up
   };
 
-constexpr float RANGE = 5.0f;
+constexpr float RANGE = 10.0f;
 constexpr float PRECISION = 0.1f;
 constexpr char FNAME[] = "lut.csv";
 
@@ -80,7 +80,7 @@ void LocationLUT::buildLUT(){
       for(int x = -RANGE/PRECISION; x < RANGE/PRECISION; x++){
 	std::vector<float> pt = {x*PRECISION, y*PRECISION, z*PRECISION};
 	//Don't worry about noises right next to the person
-	if(dist(center, pt) < 0.25) continue;
+	if(dist(center, pt) < 0.05) continue;
 	
 	std::tuple<float, float, float> offsets
 	  = offsetsForLocation(x*PRECISION, y*PRECISION, z*PRECISION);
@@ -89,7 +89,8 @@ void LocationLUT::buildLUT(){
 	  found_points.insert(std::make_pair(offsets, t));
 	}
 
-	std::vector<std::tuple<float, float, float>>& entry = found_points.at(offsets);
+	std::vector<std::tuple<float, float, float>>& entry
+	  = found_points.at(offsets);
 	/*float mag = std::sqrt(x*x*PRECISION*PRECISION +
 			      y*y*PRECISION*PRECISION +
 			      z*z*PRECISION*PRECISION);*/
@@ -122,7 +123,8 @@ void LocationLUT::buildLUT(){
       y /= bucket.size();
       z /= bucket.size();
 
-      lut.insert(std::make_pair(it->first, std::make_tuple(x, y, z, bucket.size())));      
+      lut.insert(std::make_pair(it->first,
+				std::make_tuple(x, y, z, bucket.size())));
     }
   }
 }
@@ -153,7 +155,8 @@ void LocationLUT::loadLUT(){
 	     >> floats[5] >> eatcomma
 	     >> theint;
       
-      lut.insert(std::make_pair(std::make_tuple(floats[0], floats[1], floats[2]),
+      lut.insert(std::make_pair(std::make_tuple(floats[0], floats[1],
+						floats[2]),
 				std::make_tuple(floats[3], floats[4],
 						floats[5], theint)));
     }
@@ -197,13 +200,34 @@ LocationLUT::LocationLUT(){
 
 std::tuple<float, float, float, int>
 LocationLUT::get(std::tuple<float, float, float> offsets){
-  //TODO: If space is empty, spiral out to nearby items
+  std::cout << "lookup: " << "(" << std::get<0>(offsets) << ", "
+	    << std::get<1>(offsets) << ", "
+	    << std::get<2>(offsets) << ")" << std::endl;
+  
   if(lut.count(offsets) > 0){
     std::tuple<float, float, float, int> &entry
       = lut.at(offsets);
-
-    return entry; //TODO: something smarter
+    return entry;
   } else {
-    return std::make_tuple(0.0f, 0.0f, 0.0f, 0);
+    //TODO: Spiral out, keep looking
+    constexpr float TICK_SIZE = 1/LUT_KEY_PREC;
+    int num_ticks = 1;
+    while(num_ticks < 10){
+      for(int x=-num_ticks; x <= num_ticks; x++){
+	for(int y=-num_ticks; y <= num_ticks; y++){
+	  for(int z=-num_ticks; z <= num_ticks; z++){
+	    std::tuple<float, float, float> trial_offsets
+	      = std::make_tuple(std::get<0>(offsets) + x*TICK_SIZE,
+				std::get<1>(offsets) + y*TICK_SIZE,
+				std::get<2>(offsets) + z*TICK_SIZE);
+	    if(lut.count(trial_offsets) > 0){
+	      return lut.at(trial_offsets);
+	    }
+	  }
+	}
+      }
+      num_ticks++;
+    }
+    return std::make_tuple(10.0f, 10.0f, 10.0f, -1);
   }
 }

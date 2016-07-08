@@ -34,7 +34,7 @@
 
 #include "tracking.h"
 
-constexpr float LUT_KEY_PREC = 10.0f;
+constexpr float LUT_KEY_PREC = 1.0f;
 
 class LocationLUT {
  public:
