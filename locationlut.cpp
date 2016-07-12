@@ -75,6 +75,8 @@ void LocationLUT::buildLUT(){
   
   static std::vector<float> center = {0.0f, 0.0f, 0.0f};
 
+  //A sphere with 64k points on it, each point should be spaced
+  // about one degree apart
   std::vector<std::vector<float> > pts = genPoints(256*256);
 
   float scale = 1.5;
