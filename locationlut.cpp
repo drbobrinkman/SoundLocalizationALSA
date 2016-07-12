@@ -21,6 +21,7 @@
 
 #include "locationlut.h"
 #include "microphone.h"
+#include "spherepoints.h"
 
 #include <iostream>
 #include <iomanip>
@@ -73,31 +74,31 @@ void LocationLUT::buildLUT(){
     key_hash> found_points;
   
   static std::vector<float> center = {0.0f, 0.0f, 0.0f};
-  
-  for(int z = -RANGE/PRECISION; z < RANGE/PRECISION; z++){
-    std::cout << "z == " << z << std::endl;
-    for(int y = -RANGE/PRECISION; y < RANGE/PRECISION; y++){
-      for(int x = -RANGE/PRECISION; x < RANGE/PRECISION; x++){
-	std::vector<float> pt = {x*PRECISION, y*PRECISION, z*PRECISION};
-	//Don't worry about noises right next to the person
-	if(dist(center, pt) < 0.05) continue;
-	
-	std::tuple<float, float, float> offsets
-	  = offsetsForLocation(x*PRECISION, y*PRECISION, z*PRECISION);
-	if(found_points.count(offsets) == 0){
-	  std::vector<std::tuple<float, float, float>> t;
-	  found_points.insert(std::make_pair(offsets, t));
-	}
 
-	std::vector<std::tuple<float, float, float>>& entry
-	  = found_points.at(offsets);
-	/*float mag = std::sqrt(x*x*PRECISION*PRECISION +
-			      y*y*PRECISION*PRECISION +
-			      z*z*PRECISION*PRECISION);*/
-	entry.push_back(std::make_tuple(x*PRECISION, y*PRECISION,
-					z*PRECISION));
-      }
+  std::vector<std::vector<float> > pts = genPoints(256*256);
+
+  float scale = 1.5;
+  
+  for(int i=0; i<pts.size(); i++){
+    std::vector<float> pt
+      = {scale*pts[i][0], scale*pts[i][1], scale*pts[i][2]};
+    
+    //Don't worry about noises right next to the person
+    if(dist(center, pt) < 0.05) continue;
+	
+    std::tuple<float, float, float> offsets
+      = offsetsForLocation(pt[0], pt[1], pt[2]);
+    
+    if(found_points.count(offsets) == 0){
+      std::vector<std::tuple<float, float, float>> t;
+      //Add empty tuple, to modify in a sec
+      found_points.insert(std::make_pair(offsets, t));
     }
+
+    std::vector<std::tuple<float, float, float>>& entry
+      = found_points.at(offsets);
+
+    entry.push_back(std::make_tuple(pt[0], pt[1], pt[2]));
   }
 
   /* Now, build the LUT using the found_points */
@@ -200,10 +201,10 @@ LocationLUT::LocationLUT(){
 
 std::tuple<float, float, float, int>
 LocationLUT::get(std::tuple<float, float, float> offsets){
-  std::cout << "lookup: " << "(" << std::get<0>(offsets) << ", "
+  /*std::cout << "lookup: " << "(" << std::get<0>(offsets) << ", "
 	    << std::get<1>(offsets) << ", "
 	    << std::get<2>(offsets) << ")" << std::endl;
-  
+  */
   if(lut.count(offsets) > 0){
     std::tuple<float, float, float, int> &entry
       = lut.at(offsets);
