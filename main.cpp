@@ -88,24 +88,47 @@ int main() {
       }
     }
 
+    //The starting value was determined empirically
+    static float background_loudness = 100.0f;
+    
+    //Find the loudness of the loudest channel
     float loudness = l[0].second;
     for(int i=1; i<4; i++){
       loudness = std::max(loudness, l[i].second);
     }
-    int i=0;
-    for(;i<loudness;i+=100){
-      std::cout << "=";
+
+    if(loudness > 2*background_loudness){
+      //Might have a signal!
+      //TODO: Should also check the error in the alignment produced above
+      
+      std::cout << std::fixed << std::setprecision(2) << std::setw(7)
+		<< loudness;
+      
+      int i=0;
+      for(;i<loudness;i+=200){
+	std::cout << "=";
+      }
+      for(;i<3000;i+=200){
+	std::cout << " ";
+      }
+      //Now do a LUT lookup
+      std::tuple<float, float, float, int> entry =
+	lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
+				offsets[2][bestk]));
+      std::cout
+	<< "[" << offsets[0][besti] << ", "
+	<< offsets[1][bestj] << ", "
+	<< offsets[2][bestk] << "] "
+	<< "(" << std::get<0>(entry) << ", "
+	<< std::get<1>(entry) << ", "
+	<< std::get<2>(entry) << ")" << std::endl;
+
+      //TODO: Adjust the background noise level? Maybe leave alone,
+      // if we found a signal?
+    } else {
+      //Smooth our estimate of the background noise level
+      background_loudness = 0.75*background_loudness + 0.25*loudness;
     }
-    for(;i<1500;i+=100){
-      std::cout << " ";
-    }
-    //Now do a LUT lookup
-    std::tuple<float, float, float, int> entry =
-      lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
-			      offsets[2][bestk]));
-    std::cout << "(" << std::get<0>(entry) << ", "
-	      << std::get<1>(entry) << ", "
-	      << std::get<2>(entry) << ")" << std::endl;
   }
   return 0;
 }
