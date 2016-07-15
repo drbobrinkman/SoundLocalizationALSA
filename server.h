@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <thread>
 #include <boost/network/protocol/http/server.hpp>
 namespace http = boost::network::http;
 
@@ -39,6 +40,8 @@ class Server {
   // delete
   Server();
   ~Server();
+
+  std::thread t;
   
  public:
   //This is to make sure we don't forget to declare our variables

@@ -44,8 +44,8 @@ void Server::run(){
   server_.run();
 }
 
-Server::Server(){
-  run();
+Server::Server() : t(&Server::run, this){
+  t.detach();
 }
 
 Server::~Server(){
