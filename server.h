@@ -42,6 +42,8 @@ class Server {
   ~Server();
 
   std::thread t;
+
+  bool running=true;
   
  public:
   //This is to make sure we don't forget to declare our variables
@@ -49,6 +51,8 @@ class Server {
   Server(Server const&) = delete;
   void operator=(Server const&) = delete;
 
+  bool isRunning();
+  
  public:
   void run();
 	   

@@ -45,7 +45,7 @@ int main() {
   Microphone& m = Microphone::getInstance();
   
   //Loop forever. Right now, must kill via ctrl-c
-  for(int j=0; j<60*10; j++){
+  while(s.isRunning()){
     int retVal;
 
     //First, read data
@@ -57,7 +57,7 @@ int main() {
 
     //Next, calculate mean and stdev for rescaling and centering signals
     std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer.data(),
-					  m.frames);
+							      m.frames);
 
     //Then rescale and recenter each signal, so all have
     // mean of 0, and same stdev as loudest signal
@@ -109,49 +109,39 @@ int main() {
       loudness = std::max(loudness, l[i].second);
     }
 
-    //    if(loudness > 2*background_loudness){
-      //Might have a signal!
-      //TODO: Should also check the error in the alignment produced above
+    /*    std::cout << std::fixed << std::setprecision(2) << std::setw(7)
+	      << loudness << " " << bestDiff;
       
-      std::cout << std::fixed << std::setprecision(2) << std::setw(7)
-		<< loudness << " " << bestDiff;
-      
-      int i=0;
-      for(;i<loudness;i+=200){
-	std::cout << "=";
-      }
-      for(;i<3000;i+=200){
-	std::cout << " ";
-      }
-      //Now do a LUT lookup
-      std::tuple<float, float, float, int> entry =
-	lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
-				offsets[2][bestk]));
-
-      std::vector<float> cur_pt
-	= {std::get<0>(entry),
-	   std::get<1>(entry),
-	   std::get<2>(entry)};
-
-      static std::vector<float> last_pt = cur_pt;
-      
-      std::cout
-	<< "[" << offsets[0][besti] << ", "
-	<< offsets[1][bestj] << ", "
-	<< offsets[2][bestk] << "] "
-	<< "(" << std::get<0>(entry) << ", "
-	<< std::get<1>(entry) << ", "
-	<< std::get<2>(entry) << ")"
-	<< " " << dist3(cur_pt, last_pt)
-	<< std::endl;
-
-      last_pt = cur_pt;
-      //TODO: Adjust the background noise level? Maybe leave alone,
-      // if we found a signal?
-      /*} else {
-      //Smooth our estimate of the background noise level
-      background_loudness = 0.75*background_loudness + 0.25*loudness;
+    int i=0;
+    for(;i<loudness;i+=200){
+      std::cout << "=";
+    }
+    for(;i<3000;i+=200){
+      std::cout << " ";
       }*/
+    //Now do a LUT lookup
+    std::tuple<float, float, float, int> entry =
+      lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
+			      offsets[2][bestk]));
+
+    std::vector<float> cur_pt
+      = {std::get<0>(entry),
+	 std::get<1>(entry),
+	 std::get<2>(entry)};
+
+    static std::vector<float> last_pt = cur_pt;
+    /*      
+    std::cout
+      << "[" << offsets[0][besti] << ", "
+      << offsets[1][bestj] << ", "
+      << offsets[2][bestk] << "] "
+      << "(" << std::get<0>(entry) << ", "
+      << std::get<1>(entry) << ", "
+      << std::get<2>(entry) << ")"
+      << " " << dist3(cur_pt, last_pt)
+      << std::endl;
+    */
+    last_pt = cur_pt;
   }
   return 0;
 }

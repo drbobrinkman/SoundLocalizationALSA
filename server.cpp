@@ -31,7 +31,8 @@ using namespace boost::network;
 
 void Server::operator() (http_server::request const &request,
 		   http_server::response &response) {
-
+  std::string a = destination(request);
+  std::cout << a << std::endl;
   
   response = http_server::response::stock_reply(
 	         http_server::response::ok,
@@ -43,6 +44,11 @@ void Server::operator() (http_server::request const &request,
   content_header.name = "Content-Type";
   content_header.value = "image/svg+xml";
   response.headers.push_back(content_header);
+}
+
+bool Server::isRunning(){
+  //TODO: Mutex!
+  return running;
 }
 
 void Server::log(http_server::string_type const &info) {
