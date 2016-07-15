@@ -21,6 +21,12 @@
 
 #pragma once
 
+#include <boost/network/protocol/http/server.hpp>
+namespace http = boost::network::http;
+
+class Server;
+typedef http::server<Server> http_server;
+
 class Server {
  public:
   static Server& getInstance(){
@@ -39,4 +45,8 @@ class Server {
   // as references
   Server(Server const&) = delete;
   void operator=(Server const&) = delete;
+
+  void log(http_server::string_type const &info);
+  void operator() (http_server::request const &request,
+		   http_server::response &response);
 };
