@@ -21,15 +21,27 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 #include "microphone.h"
 #include "locationlut.h"
+#include "server.h"
 #include "soundProcessing.h"
 #include "tracking.h"
+
+float dist3(std::vector<float> a, std::vector<float> b){
+  float total = 0.0f;
+  for(int i=0; i < a.size() && i < b.size(); i++){
+    total += (a[i] - b[i])*(a[i] - b[i]);
+  }
+
+  return std::sqrt(total);
+}
 
 int main() {
   //Build the LUT before opening the mic
   LocationLUT& lut = LocationLUT::getInstance();
+  Server& s = Server::getInstance();
   Microphone& m = Microphone::getInstance();
   
   //Loop forever. Right now, must kill via ctrl-c
@@ -97,12 +109,12 @@ int main() {
       loudness = std::max(loudness, l[i].second);
     }
 
-    if(loudness > 2*background_loudness){
+    //    if(loudness > 2*background_loudness){
       //Might have a signal!
       //TODO: Should also check the error in the alignment produced above
       
       std::cout << std::fixed << std::setprecision(2) << std::setw(7)
-		<< loudness;
+		<< loudness << " " << bestDiff;
       
       int i=0;
       for(;i<loudness;i+=200){
@@ -115,20 +127,31 @@ int main() {
       std::tuple<float, float, float, int> entry =
 	lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
 				offsets[2][bestk]));
+
+      std::vector<float> cur_pt
+	= {std::get<0>(entry),
+	   std::get<1>(entry),
+	   std::get<2>(entry)};
+
+      static std::vector<float> last_pt = cur_pt;
+      
       std::cout
 	<< "[" << offsets[0][besti] << ", "
 	<< offsets[1][bestj] << ", "
 	<< offsets[2][bestk] << "] "
 	<< "(" << std::get<0>(entry) << ", "
 	<< std::get<1>(entry) << ", "
-	<< std::get<2>(entry) << ")" << std::endl;
+	<< std::get<2>(entry) << ")"
+	<< " " << dist3(cur_pt, last_pt)
+	<< std::endl;
 
+      last_pt = cur_pt;
       //TODO: Adjust the background noise level? Maybe leave alone,
       // if we found a signal?
-    } else {
+      /*} else {
       //Smooth our estimate of the background noise level
       background_loudness = 0.75*background_loudness + 0.25*loudness;
-    }
+      }*/
   }
   return 0;
 }
