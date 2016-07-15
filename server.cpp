@@ -21,6 +21,11 @@
 
 #include "server.h"
 
+/**
+ * TODO: If I was a good person, we would possibly separate concerns
+ *  here ... I've merged the handler with the server, not confident
+ *  this is the best design.
+ **/
 
 void Server::operator() (http_server::request const &request,
 		   http_server::response &response) {
@@ -32,11 +37,15 @@ void Server::log(http_server::string_type const &info) {
   std::cerr << "ERROR: " << info << '\n';
 }
 
-Server::Server(){
+void Server::run(){
   http_server::options options(*this);
   http_server server_(options.address("0.0.0.0")
 		             .port("8000"));
   server_.run();
+}
+
+Server::Server(){
+  run();
 }
 
 Server::~Server(){

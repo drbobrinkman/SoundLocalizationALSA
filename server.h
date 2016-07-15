@@ -39,13 +39,16 @@ class Server {
   // delete
   Server();
   ~Server();
-
+  
  public:
   //This is to make sure we don't forget to declare our variables
   // as references
   Server(Server const&) = delete;
   void operator=(Server const&) = delete;
 
+ public:
+  void run();
+	   
   void log(http_server::string_type const &info);
   void operator() (http_server::request const &request,
 		   http_server::response &response);
