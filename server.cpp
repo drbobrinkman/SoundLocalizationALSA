@@ -27,10 +27,22 @@
  *  this is the best design.
  **/
 
+using namespace boost::network;
+
 void Server::operator() (http_server::request const &request,
 		   http_server::response &response) {
+
+  
   response = http_server::response::stock_reply(
-	         http_server::response::ok, "Hello, world!");
+	         http_server::response::ok,
+		 "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">\n" 
+		 "<circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n" 
+		 "</svg>"
+						);
+  http_server::response_header content_header;
+  content_header.name = "Content-Type";
+  content_header.value = "image/svg+xml";
+  response.headers.push_back(content_header);
 }
 
 void Server::log(http_server::string_type const &info) {
