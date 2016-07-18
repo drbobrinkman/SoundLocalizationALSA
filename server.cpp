@@ -31,19 +31,25 @@ using namespace boost::network;
 
 void Server::operator() (http_server::request const &request,
 		   http_server::response &response) {
-  std::string a = destination(request);
-  std::cout << a << std::endl;
-  
-  response = http_server::response::stock_reply(
-	         http_server::response::ok,
-		 "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">\n" 
-		 "<circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n" 
-		 "</svg>"
-						);
-  http_server::response_header content_header;
-  content_header.name = "Content-Type";
-  content_header.value = "image/svg+xml";
-  response.headers.push_back(content_header);
+  std::string command = destination(request);
+
+  if(command.find("exit") == 1){
+    //If I was a good person I might put a mutex on this, but
+    // in a race condition we will just go around one more time
+    running = false;
+  } else {
+    response = http_server::response::stock_reply
+      (http_server::response::ok,
+       "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">\n" 
+       "<circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n" 
+       "</svg>"
+       );
+
+    http_server::response_header content_header;
+    content_header.name = "Content-Type";
+    content_header.value = "image/svg+xml";
+    response.headers.push_back(content_header);
+  }
 }
 
 bool Server::isRunning(){
