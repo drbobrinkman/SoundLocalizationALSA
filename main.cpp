@@ -130,6 +130,8 @@ int main() {
 	 std::get<2>(entry)};
 
     static std::vector<float> last_pt = cur_pt;
+
+    s.putBuffer(m.buffer);
     /*      
     std::cout
       << "[" << offsets[0][besti] << ", "

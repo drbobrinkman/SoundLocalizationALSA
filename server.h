@@ -22,6 +22,7 @@
 #pragma once
 
 #include <thread>
+#include <vector>
 #include <boost/network/protocol/http/server.hpp>
 namespace http = boost::network::http;
 
@@ -52,6 +53,9 @@ class Server {
   void operator=(Server const&) = delete;
 
   bool isRunning();
+  void putBuffer(std::vector<char> const &ibuffer);
+
+  std::vector<char> buffer;
   
  public:
   void run();
