@@ -54,10 +54,12 @@ class Server {
 
   bool isRunning();
   void putBuffer(std::vector<char> const &ibuffer, float iloudness,
-		 std::vector<float> loc);
+		 std::vector<float> loc,
+		 std::vector<std::vector<float> > irecent_pts);
 
   std::vector<char> buffer;
   std::vector<float> offsets;
+  std::vector<std::vector<float> > recent_pts;
   float loudness;
 
   http_server::options options;

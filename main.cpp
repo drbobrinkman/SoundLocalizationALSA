@@ -43,6 +43,9 @@ int main() {
   LocationLUT& lut = LocationLUT::getInstance();
   Server& s = Server::getInstance();
   Microphone& m = Microphone::getInstance();
+
+  long frameNumber = 0;
+  std::vector<std::vector<float> > recent_pts;
   
   //Loop forever. Right now, must kill via ctrl-c
   while(s.isRunning()){
@@ -139,22 +142,29 @@ int main() {
     // user are 1, 2, and 3 (not 0)
     //Now do a LUT lookup
     std::vector<float> loc = {
-      (float)(offsets[1][bestj] - offsets[0][besti]),
-      (float)(offsets[2][bestk] - offsets[0][besti]),
-      (float)(offsets[3][bestl] - offsets[0][besti])
+      (float)(-offsets[1][bestj] + offsets[0][besti]),
+      (float)(-offsets[2][bestk] + offsets[0][besti]),
+      (float)(-offsets[3][bestl] + offsets[0][besti])
     };
     std::vector<float> entry = lut.get(loc);
 
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
-
     static std::vector<float> last_pt = cur_pt;
 
+    //Keep a list of all points found in the last 1/6 of a second
+    std::vector<float> new_recent_pt = cur_pt;
+    new_recent_pt.push_back(loudness);
+    new_recent_pt.push_back(frameNumber);
+    recent_pts.push_back(new_recent_pt);
+    while(recent_pts.size() > 0 && frameNumber - recent_pts[0][4] > 10){
+      recent_pts.erase(recent_pts.begin());
+    }
+    
     float d = dist3(cur_pt, last_pt);
-
+    
     if(loudness > 300.0f){
-      //if(d > 1.95){
-	s.putBuffer(m.buffer, loudness, loc);
-	//}
+      s.putBuffer(m.buffer, loudness, loc, recent_pts);
+
       std::cout << std::fixed << std::setprecision(2) << std::setw(7)
 		<< loudness << " " << bestDiff;
       
@@ -176,7 +186,8 @@ int main() {
 	<< " " << dist3(cur_pt, last_pt)
 	<< std::endl;
     }
-   
+
+    frameNumber++;
     last_pt = cur_pt;
   }
   return 0;

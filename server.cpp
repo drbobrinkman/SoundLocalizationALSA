@@ -47,7 +47,7 @@ void Server::operator() (http_server::request const &request,
     std::string response_str
       = "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"";
     response_str += std::to_string(4*(int)(0.5f + 16000.0f/60));
-    response_str += "\" height=\"100\">\n";
+    response_str += "\" height=\"400\">\n";
 
     std::vector<std::string> colors = {"red", "green", "blue", "black"};
 
@@ -72,6 +72,18 @@ void Server::operator() (http_server::request const &request,
       response_str += ";stroke-width:1\" />\n";
     }
 
+    response_str += "<circle cx=\"200\" cy=\"198\" r=\"2\" fill=\"black\"/>\n";
+    response_str += "<circle cx=\"202\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
+    response_str += "<circle cx=\"198\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
+
+    for(int i=0; i < recent_pts.size(); i++){
+      response_str += "<circle cx=\"";
+      response_str += std::to_string(200 + recent_pts[i][0]*50);
+      response_str += "\" cy=\"";
+      response_str += std::to_string(200 - recent_pts[i][1]*50);
+      response_str += "\" r=\"2\" fill=\"blue\"/>\n";
+    }
+    
     response_str += "</svg>\n";
     
     response = http_server::response::stock_reply
@@ -107,10 +119,12 @@ Server::~Server(){
 }
 
 void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
-		       std::vector<float> ioffsets){
+		       std::vector<float> ioffsets,
+		       std::vector<std::vector<float> > irecent_pts){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;
   buffer = ibuffer;
   loudness = iloudness;
+  recent_pts = irecent_pts;
 }
