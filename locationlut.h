@@ -31,7 +31,7 @@
 #include <functional>
 #include <vector>
 
-#include "tracking.h"
+#include "constants.h"
 
 constexpr float LUT_KEY_PREC = 1.0f;
 

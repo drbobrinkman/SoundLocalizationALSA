@@ -27,7 +27,7 @@
 #include "locationlut.h"
 #include "server.h"
 #include "soundProcessing.h"
-#include "tracking.h"
+#include "constants.h"
 
 float dist3(std::vector<float> a, std::vector<float> b){
   float total = 0.0f;
@@ -100,14 +100,6 @@ int main() {
       }
     }
 
-    /*for(int i=0; i<offsets.size(); i++){
-      for(int j=0; j<offsets[i].size(); j++){
-	std::cout << offsets[i][j] << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-    */
     //Now do a four-way alignment on the 5^3 candidate offsets
     int besti = -1;
     int bestj = -1;
@@ -151,6 +143,7 @@ int main() {
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
     static std::vector<float> last_pt = cur_pt;
 
+    //TODO //--- Create a class that tracks recent points
     //Keep a list of all points found in the last 1/6 of a second
     std::vector<float> new_recent_pt = cur_pt;
     new_recent_pt.push_back(loudness);
