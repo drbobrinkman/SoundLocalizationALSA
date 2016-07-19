@@ -75,7 +75,7 @@ int main() {
     int offsets[3][5];
     for(int i=0; i<3; i++){
       for(int j=0; j<5; j++){
-	offsets[i][j] = best[i].top().second;
+	offsets[i][j] = (int)best[i].top().second;
 	best[i].pop();
       }
     }
@@ -109,7 +109,24 @@ int main() {
       loudness = std::max(loudness, l[i].second);
     }
 
-    /*    std::cout << std::fixed << std::setprecision(2) << std::setw(7)
+    //Now do a LUT lookup
+    std::vector<float> loc = {
+      (float)offsets[0][besti],
+      (float)offsets[1][bestj],
+      (float)offsets[2][bestk]
+    };
+    std::vector<float> entry = lut.get(loc);
+
+    std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
+
+    static std::vector<float> last_pt = cur_pt;
+
+    float d = dist3(cur_pt, last_pt);
+
+    //if(d > 1.95 && offsets[0][besti] == -10){
+    s.putBuffer(m.buffer, loudness, loc);
+
+    std::cout << std::fixed << std::setprecision(2) << std::setw(7)
 	      << loudness << " " << bestDiff;
       
     int i=0;
@@ -118,31 +135,19 @@ int main() {
     }
     for(;i<3000;i+=200){
       std::cout << " ";
-      }*/
-    //Now do a LUT lookup
-    std::tuple<float, float, float, int> entry =
-      lut.get(std::make_tuple(offsets[0][besti], offsets[1][bestj],
-			      offsets[2][bestk]));
+    }
 
-    std::vector<float> cur_pt
-      = {std::get<0>(entry),
-	 std::get<1>(entry),
-	 std::get<2>(entry)};
-
-    static std::vector<float> last_pt = cur_pt;
-
-    s.putBuffer(m.buffer);
-    /*      
     std::cout
       << "[" << offsets[0][besti] << ", "
       << offsets[1][bestj] << ", "
       << offsets[2][bestk] << "] "
-      << "(" << std::get<0>(entry) << ", "
-      << std::get<1>(entry) << ", "
-      << std::get<2>(entry) << ")"
+      << "(" << entry[0] << ", "
+      << entry[1] << ", "
+      << entry[2] << ")"
       << " " << dist3(cur_pt, last_pt)
       << std::endl;
-    */
+    // }
+   
     last_pt = cur_pt;
   }
   return 0;

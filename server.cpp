@@ -51,14 +51,19 @@ void Server::operator() (http_server::request const &request,
 
     std::vector<std::string> colors = {"red", "green", "blue", "black"};
 
+    if(loudness < 1.0f) loudness = 1.0f;
+    
     for(int i=0; i<colors.size(); i++){
       response_str += "  <polyline points=\"";
-
+      int offset = 0;
+      if(i != 0){
+	offset = offsets[i-1];
+      }
       int x = 0;
       for(int j=2*i; j < buffer.size(); j += 8){
 	int16_t val = *(int16_t*)(buffer.data() + j);
-	response_str += std::to_string(x) + ","
-	  + std::to_string(25 + (val/32768.0f)*25) + " ";
+	response_str += std::to_string(x + offset) + ","
+	  + std::to_string(25 + (val/(4*loudness))*25) + " ";
 
 	x += 4;
       }
@@ -89,21 +94,23 @@ void Server::log(http_server::string_type const &info) {
 }
 
 void Server::run(){
-  http_server::options options(*this);
-  http_server server_(options.address("0.0.0.0")
-		             .port("8000"));
   server_.run();
 }
 
-Server::Server() : t(&Server::run, this){
+Server::Server() : t(&Server::run, this), options(*this),
+		   server_(options.address("0.0.0.0")
+		             .port("8000")) {
   t.detach();
 }
 
 Server::~Server(){
 }
 
-void Server::putBuffer(std::vector<char> const &ibuffer){
+void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
+		       std::vector<float> ioffsets){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
+  offsets = ioffsets;
   buffer = ibuffer;
+  loudness = iloudness;
 }

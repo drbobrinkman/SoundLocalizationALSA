@@ -53,9 +53,15 @@ class Server {
   void operator=(Server const&) = delete;
 
   bool isRunning();
-  void putBuffer(std::vector<char> const &ibuffer);
+  void putBuffer(std::vector<char> const &ibuffer, float iloudness,
+		 std::vector<float> loc);
 
   std::vector<char> buffer;
+  std::vector<float> offsets;
+  float loudness;
+
+  http_server::options options;
+  http_server server_;
   
  public:
   void run();

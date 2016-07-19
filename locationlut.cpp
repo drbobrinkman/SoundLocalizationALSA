@@ -50,7 +50,7 @@ float dist(std::vector<float> pt1, std::vector<float> pt2){
   return std::sqrt(val);
 }
 
-std::tuple<float, float, float> offsetsForLocation(float x, float y, float z){
+std::vector<float> offsetsForLocation(float x, float y, float z){
   std::vector<float> pt = {x, y, z};
 
   float micDists[NUM_CHANNELS];
@@ -58,19 +58,21 @@ std::tuple<float, float, float> offsetsForLocation(float x, float y, float z){
     micDists[i] = dist(pt, MIC_LOCATIONS[i]);
   }
   
-  return std::make_tuple
-    (round(LUT_KEY_PREC*((micDists[0] - micDists[1])
+  std::vector<float> ret = {
+    ((float)round(LUT_KEY_PREC*((micDists[0] - micDists[1])
 			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC,
-     round(LUT_KEY_PREC*((micDists[0] - micDists[2])
+     (float)round(LUT_KEY_PREC*((micDists[0] - micDists[2])
 			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC,
-     round(LUT_KEY_PREC*((micDists[0] - micDists[3])
-			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC);
+     (float)round(LUT_KEY_PREC*((micDists[0] - micDists[3])
+			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC)};
+
+  return ret;
 }
 
 void LocationLUT::buildLUT(){
   /* First, generate a big list of points */
-  std::unordered_map<std::tuple<float, float, float>,
-    std::vector<std::tuple<float, float, float>>,
+  std::unordered_map<std::vector<float>,
+    std::vector<std::vector<float>>,
     key_hash> found_points;
   
   static std::vector<float> center = {0.0f, 0.0f, 0.0f};
@@ -88,32 +90,31 @@ void LocationLUT::buildLUT(){
     //Don't worry about noises right next to the person
     if(dist(center, pt) < 0.05) continue;
 	
-    std::tuple<float, float, float> offsets
+    std::vector<float> offsets
       = offsetsForLocation(pt[0], pt[1], pt[2]);
     
     if(found_points.count(offsets) == 0){
-      std::vector<std::tuple<float, float, float>> t;
+      std::vector<std::vector<float>> t;
       //Add empty tuple, to modify in a sec
       found_points.insert(std::make_pair(offsets, t));
     }
 
-    std::vector<std::tuple<float, float, float>>& entry
+    std::vector<std::vector<float>>& entry
       = found_points.at(offsets);
 
-    entry.push_back(std::make_tuple(pt[0], pt[1], pt[2]));
+    
+    entry.push_back(pt);
   }
 
   /* Now, build the LUT using the found_points */
   for(auto it=found_points.begin(); it!=found_points.end(); ++it){
-    std::vector<std::tuple<float, float, float>> &bucket = it->second;
+    std::vector<std::vector<float>> &bucket = it->second;
 
     if(bucket.size() > 0){
       float x=0.0f, y=0.0f, z=0.0f;
       
       for(int i=0; i<bucket.size(); i++){
-	std::vector<float> pt = {std::get<0>(bucket[i]),
-				 std::get<1>(bucket[i]),
-				 std::get<2>(bucket[i])};
+	std::vector<float> pt(bucket[i].begin(), bucket[i].begin()+3);
 
 	float mag = dist(center, pt);
 
@@ -126,8 +127,10 @@ void LocationLUT::buildLUT(){
       y /= bucket.size();
       z /= bucket.size();
 
-      lut.insert(std::make_pair(it->first,
-				std::make_tuple(x, y, z, bucket.size())));
+      std::vector<float> newent = {
+	(float)x, (float)y, (float)z, (float)bucket.size()
+      };
+      lut.insert(std::make_pair(it->first, newent));
     }
   }
 }
@@ -157,11 +160,14 @@ void LocationLUT::loadLUT(){
 	     >> floats[4] >> eatcomma
 	     >> floats[5] >> eatcomma
 	     >> theint;
-      
-      lut.insert(std::make_pair(std::make_tuple(floats[0], floats[1],
-						floats[2]),
-				std::make_tuple(floats[3], floats[4],
-						floats[5], theint)));
+
+      std::vector<float> key = {
+	floats[0], floats[1], floats[2]
+      };
+      std::vector<float> ent = {
+	floats[3], floats[4],floats[5], (float)theint
+      };
+      lut.insert(std::make_pair(key, ent));
     }
   }
   std::cout << "lut size, loaded: " << lut.size() << std::endl;
@@ -185,14 +191,14 @@ void LocationLUT::saveLUT(){
   
   for(auto it=lut.begin(); it!=lut.end(); ++it){
     outfile << std::fixed << std::setprecision(1)
-	    << std::setw(5) << std::get<0>(it->first) << ", "
-	    << std::setw(5) << std::get<1>(it->first) << ", "
-	    << std::setw(5) << std::get<2>(it->first) << ", "
+	    << std::setw(5) << (it->first)[0] << ", "
+	    << std::setw(5) << (it->first)[1] << ", "
+	    << std::setw(5) << (it->first)[2] << ", "
 	    << std::setprecision(4)
-	    << std::setw(7) << std::get<0>(it->second) << ", "
-	    << std::setw(7) << std::get<1>(it->second) << ", "
-	    << std::setw(7) << std::get<2>(it->second) << ", "
-	    << std::setw(5) << std::get<3>(it->second)
+	    << std::setw(7) << (it->second)[0] << ", "
+	    << std::setw(7) << (it->second)[1] << ", "
+	    << std::setw(7) << (it->second)[2] << ", "
+	    << std::setw(5) << (it->second)[3]
       	    << std::endl;
   }
 }
@@ -201,14 +207,10 @@ LocationLUT::LocationLUT(){
   loadLUT();
 }
 
-std::tuple<float, float, float, int>
-LocationLUT::get(std::tuple<float, float, float> offsets){
-  /*std::cout << "lookup: " << "(" << std::get<0>(offsets) << ", "
-	    << std::get<1>(offsets) << ", "
-	    << std::get<2>(offsets) << ")" << std::endl;
-  */
+std::vector<float>
+LocationLUT::get(std::vector<float> offsets){
   if(lut.count(offsets) > 0){
-    std::tuple<float, float, float, int> &entry
+    std::vector<float> &entry
       = lut.at(offsets);
     return entry;
   } else {
@@ -219,10 +221,11 @@ LocationLUT::get(std::tuple<float, float, float> offsets){
       for(int x=-num_ticks; x <= num_ticks; x++){
 	for(int y=-num_ticks; y <= num_ticks; y++){
 	  for(int z=-num_ticks; z <= num_ticks; z++){
-	    std::tuple<float, float, float> trial_offsets
-	      = std::make_tuple(std::get<0>(offsets) + x*TICK_SIZE,
-				std::get<1>(offsets) + y*TICK_SIZE,
-				std::get<2>(offsets) + z*TICK_SIZE);
+	    std::vector<float> trial_offsets = {
+	      offsets[0] + x*TICK_SIZE,
+	      offsets[1] + y*TICK_SIZE,
+	      offsets[2] + z*TICK_SIZE
+	    };
 	    if(lut.count(trial_offsets) > 0){
 	      return lut.at(trial_offsets);
 	    }
@@ -231,6 +234,7 @@ LocationLUT::get(std::tuple<float, float, float> offsets){
       }
       num_ticks++;
     }
-    return std::make_tuple(10.0f, 10.0f, 10.0f, -1);
+    std::vector<float> ret = {10.0f, 10.0f, 10.0f, -1.0f};
+    return ret;
   }
 }
