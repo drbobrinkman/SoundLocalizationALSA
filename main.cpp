@@ -123,9 +123,10 @@ int main() {
 
     float d = dist3(cur_pt, last_pt);
 
-    if(loudness > 300.0f /*&& d > 1.95 && offsets[0][besti] == -10*/){
-      s.putBuffer(m.buffer, loudness, loc);
-
+    if(loudness > 300.0f){
+      if(d > 1.95){
+	s.putBuffer(m.buffer, loudness, loc);
+      }
       std::cout << std::fixed << std::setprecision(2) << std::setw(7)
 		<< loudness << " " << bestDiff;
       

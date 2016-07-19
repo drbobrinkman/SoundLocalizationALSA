@@ -138,8 +138,7 @@ void LocationLUT::loadLUT(){
   std::ifstream infile(FNAME);
   if(infile.is_open()){
         std::cout << "loading LUT" << std::endl;
-    float floats[6];
-    int theint;
+    float floats[7];
     char eatcomma;
     int count;
     std::string trash;
@@ -158,13 +157,13 @@ void LocationLUT::loadLUT(){
 	     >> floats[3] >> eatcomma
 	     >> floats[4] >> eatcomma
 	     >> floats[5] >> eatcomma
-	     >> theint;
+	     >> floats[6];
 
       std::vector<float> key = {
 	floats[0], floats[1], floats[2]
       };
       std::vector<float> ent = {
-	floats[3], floats[4],floats[5], (float)theint
+	floats[3], floats[4],floats[5], floats[6]
       };
       lut.insert(std::make_pair(key, ent));
     }
