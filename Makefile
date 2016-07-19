@@ -23,7 +23,7 @@ DBGFLAGS=-g -O0
 PRODFLAGS=-O3
 LIBS=-lasound -lpthread -lboost_system -lcppnetlib-uri -lcppnetlib-server-parsers -lcppnetlib-client-connections
 DEPS = microphone.h soundProcessing.h tracking.h locationlut.h spherepoints.h server.h
-OBJ = main.o microphone.o soundProcessing.o tracking.o locationlut.o spherepoints.o server.o
+OBJ = main.o microphone.o soundProcessing.o locationlut.o spherepoints.o server.o
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
