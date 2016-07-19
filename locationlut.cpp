@@ -33,8 +33,8 @@
 std::vector<std::vector<float> > MIC_LOCATIONS =
   {
     {0.0f, SENSOR_SPACING_METERS/(2*SIN_60), 0.0f}, //Front
-    { SENSOR_SPACING_METERS/2, -SENSOR_SPACING_METERS/(2*TAN_60), 0.0f}, //R
     {-SENSOR_SPACING_METERS/2, -SENSOR_SPACING_METERS/(2*TAN_60), 0.0f}, //L
+    { SENSOR_SPACING_METERS/2, -SENSOR_SPACING_METERS/(2*TAN_60), 0.0f}, //R
     {0.0f, 0.0f, SENSOR_SPACING_METERS}  //Up
   };
 
@@ -59,12 +59,12 @@ std::vector<float> offsetsForLocation(float x, float y, float z){
   }
   
   std::vector<float> ret = {
-    ((float)round(LUT_KEY_PREC*((micDists[0] - micDists[1])
+    (float)round(LUT_KEY_PREC*((micDists[0] - micDists[1])
 			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC,
      (float)round(LUT_KEY_PREC*((micDists[0] - micDists[2])
 			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC,
      (float)round(LUT_KEY_PREC*((micDists[0] - micDists[3])
-			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC)};
+			 *SPEED_OF_SOUND_SAMPLES_PER_METER))/LUT_KEY_PREC};
 
   return ret;
 }
@@ -101,7 +101,6 @@ void LocationLUT::buildLUT(){
 
     std::vector<std::vector<float>>& entry
       = found_points.at(offsets);
-
     
     entry.push_back(pt);
   }
