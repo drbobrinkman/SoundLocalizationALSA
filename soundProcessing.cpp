@@ -100,7 +100,7 @@ void findTopNOffsets(char* buffer, unsigned int frames,
     outList.pop();
   }
 
-  //Computer the first three, and put them in the heap
+  //Compute the first three, and put them in the heap
   int i = 0;
   for(; i < n && i < frames; i++){
     int offset = MIN_OFFSET + i;
@@ -118,7 +118,7 @@ void findTopNOffsets(char* buffer, unsigned int frames,
 }
 
 float diffFourway(char* buffer, unsigned int frames,
-		  int offset[3]){
+		  int offset[4]){
   unsigned int count = 0;
   float total = 0.0f;
   float val[4];
@@ -126,11 +126,9 @@ float diffFourway(char* buffer, unsigned int frames,
   for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
     count++;
     
-    val[0] = (float)*(((int16_t*)buffer)
-		      +(NUM_CHANNELS*i));
-    for(int j=1; j<4; j++){
+    for(int j=0; j<4; j++){
       val[j] = (float)*(((int16_t*)buffer)
-			+(NUM_CHANNELS*(i+offset[j-1]) + j));
+			+(NUM_CHANNELS*(i+offset[j]) + j));
     }
 
     for(int ch1=0; ch1 < 3; ch1++){
