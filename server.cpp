@@ -47,7 +47,7 @@ void Server::operator() (http_server::request const &request,
     std::string response_str
       = "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"";
     response_str += std::to_string(4*(int)(0.5f + 16000.0f/60));
-    response_str += "\" height=\"50\">\n";
+    response_str += "\" height=\"100\">\n";
 
     std::vector<std::string> colors = {"red", "green", "blue", "black"};
 
@@ -62,8 +62,8 @@ void Server::operator() (http_server::request const &request,
       int x = 0;
       for(int j=2*i; j < buffer.size(); j += 8){
 	int16_t val = *(int16_t*)(buffer.data() + j);
-	response_str += std::to_string(x + offset) + ","
-	  + std::to_string(25 + (val/(4*loudness))*25) + " ";
+	response_str += std::to_string(x - 4*offset) + ","
+	  + std::to_string(50 + (val/(4*loudness))*50) + " ";
 
 	x += 4;
       }

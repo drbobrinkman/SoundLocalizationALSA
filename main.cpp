@@ -123,30 +123,30 @@ int main() {
 
     float d = dist3(cur_pt, last_pt);
 
-    //if(d > 1.95 && offsets[0][besti] == -10){
-    s.putBuffer(m.buffer, loudness, loc);
+    if(loudness > 300.0f /*&& d > 1.95 && offsets[0][besti] == -10*/){
+      s.putBuffer(m.buffer, loudness, loc);
 
-    std::cout << std::fixed << std::setprecision(2) << std::setw(7)
-	      << loudness << " " << bestDiff;
+      std::cout << std::fixed << std::setprecision(2) << std::setw(7)
+		<< loudness << " " << bestDiff;
       
-    int i=0;
-    for(;i<loudness;i+=200){
-      std::cout << "=";
+      int i=0;
+      for(;i<loudness;i+=200){
+	std::cout << "=";
+      }
+      for(;i<3000;i+=200){
+	std::cout << " ";
+      }
+      
+      std::cout
+	<< "[" << offsets[0][besti] << ", "
+	<< offsets[1][bestj] << ", "
+	<< offsets[2][bestk] << "] "
+	<< "(" << entry[0] << ", "
+	<< entry[1] << ", "
+	<< entry[2] << ")"
+	<< " " << dist3(cur_pt, last_pt)
+	<< std::endl;
     }
-    for(;i<3000;i+=200){
-      std::cout << " ";
-    }
-
-    std::cout
-      << "[" << offsets[0][besti] << ", "
-      << offsets[1][bestj] << ", "
-      << offsets[2][bestk] << "] "
-      << "(" << entry[0] << ", "
-      << entry[1] << ", "
-      << entry[2] << ")"
-      << " " << dist3(cur_pt, last_pt)
-      << std::endl;
-    // }
    
     last_pt = cur_pt;
   }
