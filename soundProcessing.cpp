@@ -28,6 +28,25 @@
 
 #include <iostream>
 
+float dist(std::vector<float> a, std::vector<float> b){
+  float total = 0.0f;
+  for(int i=0; i < 3; i++){
+    total += (a[i] - b[i])*(a[i] - b[i]);
+  }
+
+  return std::sqrt(total);
+}
+
+std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt){
+  //Keep 1-amt of a, add in amt of b
+  std::vector<float> ret;
+  for(int i=0; i < a.size() && i < b.size(); i++){
+    ret.push_back((1.0f-amt)*a[i] + amt*b[i]);
+  }
+
+  return ret;
+}
+
 constexpr int SIZE = MAX_OFFSET - MIN_OFFSET;
 
 std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer,

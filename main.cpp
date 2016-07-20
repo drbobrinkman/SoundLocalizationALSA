@@ -28,24 +28,16 @@
 #include "server.h"
 #include "soundProcessing.h"
 #include "constants.h"
-
-float dist3(std::vector<float> a, std::vector<float> b){
-  float total = 0.0f;
-  for(int i=0; i < a.size() && i < b.size(); i++){
-    total += (a[i] - b[i])*(a[i] - b[i]);
-  }
-
-  return std::sqrt(total);
-}
+#include "tracker.h"
 
 int main() {
   //Build the LUT before opening the mic
   LocationLUT& lut = LocationLUT::getInstance();
   Server& s = Server::getInstance();
   Microphone& m = Microphone::getInstance();
-
+  Tracker& t = Tracker::getInstance();
+  
   long frameNumber = 0;
-  std::vector<std::vector<float> > recent_pts;
   
   //Loop forever. Right now, must kill via ctrl-c
   while(s.isRunning()){
@@ -127,6 +119,10 @@ int main() {
       }
     }
 
+    std::cout << " [" << offsets[0][besti] << ", "
+	      << offsets[1][bestj] << ", "
+	      << offsets[2][bestk] << ", "
+	      << offsets[3][bestl] << "]" << std::endl;
     //The starting value was determined empirically
     static float background_loudness = 100.0f;
 
@@ -143,20 +139,12 @@ int main() {
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
     static std::vector<float> last_pt = cur_pt;
 
-    //TODO //--- Create a class that tracks recent points
-    //Keep a list of all points found in the last 1/6 of a second
-    std::vector<float> new_recent_pt = cur_pt;
-    new_recent_pt.push_back(loudness);
-    new_recent_pt.push_back(frameNumber);
-    recent_pts.push_back(new_recent_pt);
-    while(recent_pts.size() > 0 && frameNumber - recent_pts[0][4] > 10){
-      recent_pts.erase(recent_pts.begin());
-    }
+    t.addPoint(cur_pt, loudness, frameNumber);    
     
-    float d = dist3(cur_pt, last_pt);
+    float d = dist(cur_pt, last_pt);
     
     if(loudness > 300.0f){
-      s.putBuffer(m.buffer, loudness, loc, recent_pts);
+      s.putBuffer(m.buffer, loudness, loc, t.getSounds());
 
       std::cout << std::fixed << std::setprecision(2) << std::setw(7)
 		<< loudness << " " << bestDiff;
@@ -170,13 +158,13 @@ int main() {
       }
       
       std::cout
-	<< "[" << offsets[0][besti] << ", "
-	<< offsets[1][bestj] << ", "
-	<< offsets[2][bestk] << "] "
+	<< "[" << loc[0] << ", "
+	<< loc[1] << ", "
+	<< loc[2] << "] "
 	<< "(" << entry[0] << ", "
 	<< entry[1] << ", "
 	<< entry[2] << ")"
-	<< " " << dist3(cur_pt, last_pt)
+	<< " " << dist(cur_pt, last_pt)
 	<< std::endl;
     }
 

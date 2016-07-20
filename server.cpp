@@ -52,24 +52,26 @@ void Server::operator() (http_server::request const &request,
     std::vector<std::string> colors = {"red", "green", "blue", "black"};
 
     if(loudness < 1.0f) loudness = 1.0f;
-    
-    for(int i=0; i<colors.size(); i++){
-      response_str += "  <polyline points=\"";
-      int offset = 0;
-      if(i != 0){
-	offset = offsets[i-1];
-      }
-      int x = 0;
-      for(int j=2*i; j < buffer.size(); j += 8){
-	int16_t val = *(int16_t*)(buffer.data() + j);
-	response_str += std::to_string(x - 4*offset) + ","
-	  + std::to_string(50 + (val/(4*loudness))*50) + " ";
 
-	x += 4;
+    if(buffer.size() > 0){
+      for(int i=0; i<colors.size(); i++){
+	response_str += "  <polyline points=\"";
+	int offset = 0;
+	if(i != 0){
+	  offset = offsets[i-1];
+	}
+	int x = 0;
+	for(int j=2*i; j < buffer.size(); j += 8){
+	  int16_t val = *(int16_t*)(buffer.data() + j);
+	  response_str += std::to_string(x + 4*offset) + ","
+	    + std::to_string(50 + (val/(4*loudness))*50) + " ";
+	  
+	  x += 4;
+	}
+	response_str += "\" style=\"fill:none;stroke:";
+	response_str += colors[i];
+	response_str += ";stroke-width:1\" />\n";
       }
-      response_str += "\" style=\"fill:none;stroke:";
-      response_str += colors[i];
-      response_str += ";stroke-width:1\" />\n";
     }
 
     response_str += "<circle cx=\"200\" cy=\"198\" r=\"2\" fill=\"black\"/>\n";
@@ -78,10 +80,12 @@ void Server::operator() (http_server::request const &request,
 
     for(int i=0; i < recent_pts.size(); i++){
       response_str += "<circle cx=\"";
-      response_str += std::to_string(200 + recent_pts[i][0]*50);
+      response_str += std::to_string(200 + recent_pts[i].first[0]*50);
       response_str += "\" cy=\"";
-      response_str += std::to_string(200 - recent_pts[i][1]*50);
-      response_str += "\" r=\"2\" fill=\"blue\"/>\n";
+      response_str += std::to_string(200 - recent_pts[i].first[1]*50);
+      response_str += "\" r=\"";
+      response_str += std::to_string(recent_pts[i].second/200);
+      response_str += "\" fill=\"blue\"/>\n";
     }
     
     response_str += "</svg>\n";
@@ -120,7 +124,8 @@ Server::~Server(){
 
 void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
 		       std::vector<float> ioffsets,
-		       std::vector<std::vector<float> > irecent_pts){
+		       std::vector<std::pair<std::vector<float>, float> >
+		       irecent_pts){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;

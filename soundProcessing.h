@@ -41,3 +41,5 @@ void findTopNOffsets(char* buffer, unsigned int frames,
 	      std::priority_queue<std::pair<float, int> >& outList);
 void recenterAndRescale(char* buffer, unsigned int frames,
 			std::vector<std::pair<float, float> > stats);
+float dist(std::vector<float> a, std::vector<float> b);
+std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt);

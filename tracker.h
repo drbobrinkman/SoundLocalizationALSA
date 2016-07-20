@@ -21,55 +21,39 @@
 
 #pragma once
 
-#include <thread>
 #include <vector>
-#include <boost/network/protocol/http/server.hpp>
-namespace http = boost::network::http;
+#include <tuple>
 
-class Server;
-typedef http::server<Server> http_server;
+constexpr float CLUSTER_DISTANCE = 0.35f;
+constexpr float SMOOTHING_FACTOR = 1.0f/6.0f;
+constexpr float SILENCE_LOUDNESS = 200.0f;
 
-class Server {
+class Tracker {
  public:
-  static Server& getInstance(){
-    static Server instance;
+  static Tracker& getInstance(){
+    static Tracker instance;
     return instance;
   }
   
  private:
-  //This is to make sure we don't try to make Servers using new and
+  //This is to make sure we don't try to make Trackers using new and
   // delete
-  Server();
-  ~Server();
+  Tracker();
+  ~Tracker();
 
-  std::thread t;
-
-  bool running=true;
-  
  public:
   //This is to make sure we don't forget to declare our variables
   // as references
-  Server(Server const&) = delete;
-  void operator=(Server const&) = delete;
+  Tracker(Tracker const&) = delete;
+  void operator=(Tracker const&) = delete;
 
-  bool isRunning();
-  void putBuffer(std::vector<char> const &ibuffer, float iloudness,
-		 std::vector<float> loc,
-		 std::vector<std::pair<std::vector<float>, float> >
-		    irecent_pts);
-
-  std::vector<char> buffer;
-  std::vector<float> offsets;
-  std::vector<std::pair<std::vector<float>, float> > recent_pts;
-  float loudness;
-
-  http_server::options options;
-  http_server server_;
-  
  public:
-  void run();
-	   
-  void log(http_server::string_type const &info);
-  void operator() (http_server::request const &request,
-		   http_server::response &response);
+  void addPoint(std::vector<float> pt, float loudness, int frameNumber);
+  void tickUntil(int frameNumber);
+  std::vector<std::pair<std::vector<float>, float> > getSounds();
+  
+ private:
+  int curFrameNumber = 0;
+  std::vector<std::pair<std::vector<float>, float> > sounds;
+  std::vector<int> soundFrameNumbers;  
 };

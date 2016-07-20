@@ -22,6 +22,7 @@
 #include "locationlut.h"
 #include "microphone.h"
 #include "spherepoints.h"
+#include "soundProcessing.h"
 
 #include <iostream>
 #include <iomanip>
@@ -41,14 +42,6 @@ std::vector<std::vector<float> > MIC_LOCATIONS =
 constexpr float RANGE = 10.0f;
 constexpr float PRECISION = 0.1f;
 constexpr char FNAME[] = "lut.csv";
-
-float dist(std::vector<float> pt1, std::vector<float> pt2){
-  float val = 0.0f;
-  for(int i=0; i<3; i++){
-    val += (pt1[i] - pt2[i])*(pt1[i] - pt2[i]);
-  }
-  return std::sqrt(val);
-}
 
 std::vector<float> offsetsForLocation(float x, float y, float z){
   std::vector<float> pt = {x, y, z};
