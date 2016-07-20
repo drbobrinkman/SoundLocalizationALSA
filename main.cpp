@@ -106,6 +106,20 @@ int main() {
 				 offsets[1][j],
 				 offsets[2][k],
 				 offsets[3][l]};
+
+	    bool sane = true;
+	    //We cannot have any pairwise offsets that are more than MAX_OFFSET
+	    // or less than MIN_OFFSET
+	    for(int ii = 0; ii < 3; ii++){
+	      for(int jj = ii+1; jj < 4; jj++){
+		if(std::abs(tryOffsets[ii] - tryOffsets[jj]) >
+		   (int)(SENSOR_SPACING_SAMPLES+0.5)){
+		  sane = false;
+		}
+	      }
+	    }
+	    if(!sane) continue;
+	    
 	    float diff = diffFourway(m.buffer.data(), m.frames, tryOffsets);
 	    if(diff < bestDiff || besti == -1){
 	      besti = i;
@@ -135,14 +149,23 @@ int main() {
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
     static std::vector<float> last_pt = cur_pt;
 
-    t.addPoint(cur_pt, loudness, frameNumber);    
-    
+        
     float d = dist(cur_pt, last_pt);
-    
-
+    //If lookup failed we get back 10.0f, so skip this data point
+    if(cur_pt[0] < 2.0f){
+      t.addPoint(cur_pt, loudness, frameNumber);    
+    }
     s.putBuffer(m.buffer, loudness, loc, t.getSounds());
 
     if(loudness > 250.0f){
+      if(d > 1.80){
+	std::cout << "{" << std::setw(3) << (int)offsets[0][besti] << ", "
+		  << std::setw(3) << (int)offsets[1][bestj] << ", "
+		  << std::setw(3) << (int)offsets[2][bestk] << ", "
+		  << std::setw(3) << (int)offsets[3][bestl] << "}"
+		  << std::endl;
+      }
+
       std::cout << std::fixed << std::setprecision(2) << std::setw(7)
 		<< loudness << " " << bestDiff;
       
