@@ -20,6 +20,7 @@
  **/
 
 #include "server.h"
+#include "constants.h"
 
 /**
  * TODO: If I was a good person, we would possibly separate concerns
@@ -29,7 +30,6 @@
 
 #include <mutex>
 
-constexpr float SILENCE_LOUDNESS = 250.0f;
 
 using namespace boost::network;
 
@@ -54,6 +54,11 @@ void Server::operator() (http_server::request const &request,
     
     response_str += "    \"sounds\": [";
     bool prev_entry = false;
+
+    std::vector<Trackable> sounds
+      = trck.getSoundsSince(frameNumberLastSentData);
+    frameNumberLastSentData = frameNumber;
+    
     for(int i=0; i < sounds.size(); i++){
       if(sounds[i].loudness < SILENCE_LOUDNESS) continue;
 
@@ -134,6 +139,9 @@ void Server::operator() (http_server::request const &request,
     response_str += "<circle cx=\"202\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"198\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
 
+    std::vector<Trackable> sounds
+      = trck.getSoundsSince(frameNumberLastSentData);
+
     for(int i=0; i < sounds.size(); i++){
       if(sounds[i].loudness < SILENCE_LOUDNESS) continue;
       
@@ -171,9 +179,9 @@ void Server::run(){
   server_.run();
 }
 
-Server::Server() : t(&Server::run, this), options(*this),
+Server::Server(Tracker& itrk) : t(&Server::run, this), options(*this),
 		   server_(options.address("0.0.0.0")
-		             .port("8000")) {
+			   .port("8000")), trck(itrk){
   t.detach();
 }
 
@@ -182,13 +190,13 @@ Server::~Server(){
 
 void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
 		       std::vector<float> ioffsets,
-		       std::vector<Trackable> isounds,
+			//std::vector<Trackable> isounds,
 		       unsigned long iframeNum){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;
   buffer = ibuffer;
   loudness = iloudness;
-  sounds = isounds;
+  //sounds = isounds;
   frameNumber = iframeNum;
 }

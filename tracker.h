@@ -52,11 +52,11 @@ class Tracker {
   void operator=(Tracker const&) = delete;
 
  public:
-  void addPoint(std::vector<float> pt, float loudness, int frameNumber);
-  void tickUntil(int frameNumber);
-  std::vector<Trackable> getSounds();
+  void addPoint(std::vector<float> pt, float loudness,
+		unsigned long frameNumber);
+  std::vector<Trackable> getSoundsSince(unsigned long frameNumber);
   
  private:
-  int curFrameNumber = 0;
+  unsigned long curFrameNumber = 0;
   std::vector<Trackable> sounds;
 };

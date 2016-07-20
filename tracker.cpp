@@ -21,6 +21,9 @@
 
 #include "tracker.h"
 #include "soundProcessing.h"
+#include "constants.h"
+
+#include <mutex>
 
 constexpr float CLUSTER_DISTANCE = 0.5f;
 constexpr float SMOOTHING_FACTOR = 1.0f/6.0f;
@@ -28,19 +31,26 @@ constexpr float TIMEOUT_SECONDS = 1.0f;
 constexpr float FPS = 60.0f;
 constexpr float TIMEOUT_FRAMES = TIMEOUT_SECONDS * FPS;
 
+std::mutex g_sounds_mutex;
+
 Tracker::Tracker(){
 }
 
 Tracker::~Tracker(){
 }
 
-void Tracker::addPoint(std::vector<float> pt, float loudness, int frameNumber){
-  //First, find the closest sound
+void Tracker::addPoint(std::vector<float> pt, float loudness,
+		       unsigned long frameNumber){
+  if(loudness < SILENCE_LOUDNESS) return;
+  
+  std::lock_guard<std::mutex> guard(g_sounds_mutex);
+
+  //First, find the closest sound that hasn't timed out
   float minDist = 100000.0f;
   int minIndex = -1;
   for(int i=0; i<sounds.size(); i++){
     float d = dist(pt, sounds[i].location);
-    if(d < minDist){
+    if(d < minDist && sounds[i].lastFrame + TIMEOUT_FRAMES >= frameNumber){
       minDist = d;
       minIndex = i;
     }
@@ -51,7 +61,7 @@ void Tracker::addPoint(std::vector<float> pt, float loudness, int frameNumber){
 
     //Then do a weighted average with the new data. It might be
     // better to weight by loudness than by a constant factor...
-    sounds[minIndex].loudness = loudness;
+    sounds[minIndex].loudness = std::max(loudness, sounds[minIndex].loudness);
     sounds[minIndex].location = lerp(sounds[minIndex].location, pt,
 				  SMOOTHING_FACTOR);
     sounds[minIndex].lastFrame = frameNumber;
@@ -61,15 +71,14 @@ void Tracker::addPoint(std::vector<float> pt, float loudness, int frameNumber){
   }
 }
 
-void Tracker::tickUntil(int frameNumber){
+std::vector<Trackable> Tracker::getSoundsSince(unsigned long sFrameNum){
+  std::lock_guard<std::mutex> guard(g_sounds_mutex);
+  //Remove and sound that hasn't been heard recently
   for(int i=sounds.size()-1; i >= 0; i--){
-    if(frameNumber - sounds[i].lastFrame >= TIMEOUT_FRAMES){
+    if(sounds[i].lastFrame + TIMEOUT_FRAMES < sFrameNum){
       sounds.erase(sounds.begin() + i);
     }
   }
-}
-
-std::vector<Trackable> Tracker::getSounds(){
   return sounds;
 }
   
