@@ -43,6 +43,60 @@ void Server::operator() (http_server::request const &request,
     //If I was a good person I might put a mutex on this, but
     // in a race condition we will just go around one more time
     running = false;
+  } else if(command.find("sounds.json") == 1){
+    std::lock_guard<std::mutex> guard(g_buffer_mutex);
+
+    
+    std::string response_str = "{\n";
+    response_str += "    \"current_frame\": ";
+    response_str += std::to_string(frameNumber);
+    response_str += ",\n";
+    
+    response_str += "    \"sounds\": [";
+    bool prev_entry = false;
+    for(int i=0; i < sounds.size(); i++){
+      if(sounds[i].loudness < SILENCE_LOUDNESS) continue;
+
+      if(prev_entry){
+	response_str += "    }, ";
+      }
+      prev_entry = true;
+      
+      response_str += "{\n";
+
+      response_str += "        \"location\": [";
+      for(int j=0; j < 3; j++){
+	response_str += std::to_string(sounds[i].location[j]);
+	if(j < 2){
+	  response_str += ", ";
+	}
+      }
+      response_str += "],\n";
+
+      response_str += "        \"first_frame\": ";
+      response_str += std::to_string(sounds[i].firstFrame);
+      response_str += ",\n";
+
+      response_str += "        \"last_frame\": ";
+      response_str += std::to_string(sounds[i].lastFrame);
+      response_str += ",\n";
+
+      response_str += "        \"loudness\": ";
+      response_str += std::to_string(sounds[i].loudness);
+      response_str += "\n";
+    }
+    if(prev_entry){
+      response_str += "    }";
+    }
+    response_str += "]\n}\n";
+    
+    response = http_server::response::stock_reply
+      (http_server::response::ok, response_str);
+
+    http_server::response_header content_header;
+    content_header.name = "Content-Type";
+    content_header.value = "application/json";
+    response.headers.push_back(content_header);
   } else {
     std::lock_guard<std::mutex> guard(g_buffer_mutex);
     
@@ -128,11 +182,13 @@ Server::~Server(){
 
 void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
 		       std::vector<float> ioffsets,
-		       std::vector<Trackable> isounds){
+		       std::vector<Trackable> isounds,
+		       unsigned long iframeNum){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;
   buffer = ibuffer;
   loudness = iloudness;
   sounds = isounds;
+  frameNumber = iframeNum;
 }

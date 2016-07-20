@@ -155,7 +155,7 @@ int main() {
     if(cur_pt[0] < 2.0f){
       t.addPoint(cur_pt, loudness, frameNumber);    
     }
-    s.putBuffer(m.buffer, loudness, loc, t.getSounds());
+    s.putBuffer(m.buffer, loudness, loc, t.getSounds(), frameNumber);
 
     if(loudness > 250.0f){
       if(d > 1.80){

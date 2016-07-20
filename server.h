@@ -58,13 +58,14 @@ class Server {
   bool isRunning();
   void putBuffer(std::vector<char> const &ibuffer, float iloudness,
 		 std::vector<float> loc,
-		 std::vector<Trackable> isounds);
+		 std::vector<Trackable> isounds, unsigned long iframeNum);
 
   std::vector<char> buffer;
   std::vector<float> offsets;
   std::vector<Trackable> sounds;
   float loudness;
-
+  unsigned long frameNumber;
+  
   http_server::options options;
   http_server server_;
   
