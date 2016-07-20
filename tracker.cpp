@@ -22,6 +22,12 @@
 #include "tracker.h"
 #include "soundProcessing.h"
 
+constexpr float CLUSTER_DISTANCE = 0.5f;
+constexpr float SMOOTHING_FACTOR = 1.0f/6.0f;
+constexpr float TIMEOUT_SECONDS = 1.0f;
+constexpr float FPS = 60.0f;
+constexpr float TIMEOUT_FRAMES = TIMEOUT_SECONDS * FPS;
+
 Tracker::Tracker(){
 }
 
@@ -33,7 +39,7 @@ void Tracker::addPoint(std::vector<float> pt, float loudness, int frameNumber){
   float minDist = 100000.0f;
   int minIndex = -1;
   for(int i=0; i<sounds.size(); i++){
-    float d = dist(pt, sounds[i].first);
+    float d = dist(pt, sounds[i].location);
     if(d < minDist){
       minDist = d;
       minIndex = i;
@@ -43,43 +49,31 @@ void Tracker::addPoint(std::vector<float> pt, float loudness, int frameNumber){
   if(minIndex != -1 && minDist < CLUSTER_DISTANCE){
     //If a good cluster is found, update it
 
-    //First decay the existing point, if appropriate
-    float decay = 1.0f - SMOOTHING_FACTOR;
-    while(soundFrameNumbers[minIndex] < frameNumber-1){
-      soundFrameNumbers[minIndex]++;
-      sounds[minIndex].second *= decay;
-    }
-
     //Then do a weighted average with the new data. It might be
     // better to weight by loudness than by a constant factor...
-    sounds[minIndex].second += SMOOTHING_FACTOR*loudness;
-    sounds[minIndex].first = lerp(sounds[minIndex].first, pt,
+    sounds[minIndex].loudness = loudness;
+    sounds[minIndex].location = lerp(sounds[minIndex].location, pt,
 				  SMOOTHING_FACTOR);
-    soundFrameNumbers[minIndex] = frameNumber;
+    sounds[minIndex].lastFrame = frameNumber;
   } else {
     //If a matching cluster not found, make a new one
-    sounds.push_back(std::make_pair(pt, loudness));
-    soundFrameNumbers.push_back(frameNumber);
+    sounds.push_back(Trackable(pt, frameNumber, frameNumber, loudness));
   }
 }
 
 void Tracker::tickUntil(int frameNumber){
   for(int i=sounds.size()-1; i >= 0; i--){
-    //For each point in the list, decay it using SMOOTHING_FACTOR for each tick
-    float decay = 1.0f - SMOOTHING_FACTOR;
-    while(soundFrameNumbers[i] < frameNumber){
-      soundFrameNumbers[i]++;
-      sounds[i].second *= decay;
-    }
-    //If gets too quiet, remove
-    if(sounds[i].second < SILENCE_LOUDNESS){
+    if(frameNumber - sounds[i].lastFrame >= TIMEOUT_FRAMES){
       sounds.erase(sounds.begin() + i);
-      soundFrameNumbers.erase(soundFrameNumbers.begin() + i);
     }
   }
 }
 
-std::vector<std::pair<std::vector<float>, float> > Tracker::getSounds(){
+std::vector<Trackable> Tracker::getSounds(){
   return sounds;
 }
   
+Trackable::Trackable(std::vector<float> iloc, unsigned long iff,
+		     unsigned long ilf, float iloudness) :
+  location(iloc), firstFrame(iff), lastFrame(ilf), loudness(iloudness) {
+}

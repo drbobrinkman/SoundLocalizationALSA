@@ -29,6 +29,8 @@
 
 #include <mutex>
 
+constexpr float SILENCE_LOUDNESS = 250.0f;
+
 using namespace boost::network;
 
 std::mutex g_buffer_mutex;
@@ -78,13 +80,15 @@ void Server::operator() (http_server::request const &request,
     response_str += "<circle cx=\"202\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"198\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
 
-    for(int i=0; i < recent_pts.size(); i++){
+    for(int i=0; i < sounds.size(); i++){
+      if(sounds[i].loudness < SILENCE_LOUDNESS) continue;
+      
       response_str += "<circle cx=\"";
-      response_str += std::to_string(200 + recent_pts[i].first[0]*50);
+      response_str += std::to_string(200 + sounds[i].location[0]*50);
       response_str += "\" cy=\"";
-      response_str += std::to_string(200 - recent_pts[i].first[1]*50);
+      response_str += std::to_string(200 - sounds[i].location[1]*50);
       response_str += "\" r=\"";
-      response_str += std::to_string(recent_pts[i].second/200);
+      response_str += std::to_string(sounds[i].loudness/200);
       response_str += "\" fill=\"blue\"/>\n";
     }
     
@@ -124,12 +128,11 @@ Server::~Server(){
 
 void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
 		       std::vector<float> ioffsets,
-		       std::vector<std::pair<std::vector<float>, float> >
-		       irecent_pts){
+		       std::vector<Trackable> isounds){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;
   buffer = ibuffer;
   loudness = iloudness;
-  recent_pts = irecent_pts;
+  sounds = isounds;
 }

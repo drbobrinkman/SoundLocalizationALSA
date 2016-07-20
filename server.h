@@ -23,6 +23,9 @@
 
 #include <thread>
 #include <vector>
+
+#include "tracker.h"
+
 #include <boost/network/protocol/http/server.hpp>
 namespace http = boost::network::http;
 
@@ -55,12 +58,11 @@ class Server {
   bool isRunning();
   void putBuffer(std::vector<char> const &ibuffer, float iloudness,
 		 std::vector<float> loc,
-		 std::vector<std::pair<std::vector<float>, float> >
-		    irecent_pts);
+		 std::vector<Trackable> isounds);
 
   std::vector<char> buffer;
   std::vector<float> offsets;
-  std::vector<std::pair<std::vector<float>, float> > recent_pts;
+  std::vector<Trackable> sounds;
   float loudness;
 
   http_server::options options;

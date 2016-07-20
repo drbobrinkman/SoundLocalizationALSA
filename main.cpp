@@ -119,10 +119,6 @@ int main() {
       }
     }
 
-    std::cout << " [" << offsets[0][besti] << ", "
-	      << offsets[1][bestj] << ", "
-	      << offsets[2][bestk] << ", "
-	      << offsets[3][bestl] << "]" << std::endl;
     //The starting value was determined empirically
     static float background_loudness = 100.0f;
 
@@ -143,9 +139,10 @@ int main() {
     
     float d = dist(cur_pt, last_pt);
     
-    if(loudness > 300.0f){
-      s.putBuffer(m.buffer, loudness, loc, t.getSounds());
 
+    s.putBuffer(m.buffer, loudness, loc, t.getSounds());
+
+    if(loudness > 250.0f){
       std::cout << std::fixed << std::setprecision(2) << std::setw(7)
 		<< loudness << " " << bestDiff;
       
@@ -168,6 +165,7 @@ int main() {
 	<< std::endl;
     }
 
+    t.tickUntil(frameNumber);
     frameNumber++;
     last_pt = cur_pt;
   }

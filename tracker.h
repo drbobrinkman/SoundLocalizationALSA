@@ -22,11 +22,15 @@
 #pragma once
 
 #include <vector>
-#include <tuple>
 
-constexpr float CLUSTER_DISTANCE = 0.35f;
-constexpr float SMOOTHING_FACTOR = 1.0f/6.0f;
-constexpr float SILENCE_LOUDNESS = 200.0f;
+struct Trackable {
+  std::vector<float> location;
+  unsigned long      firstFrame;
+  unsigned long      lastFrame;
+  float              loudness;
+  Trackable(std::vector<float> iloc, unsigned long iff, unsigned long ilf,
+	    float iloudness);
+};
 
 class Tracker {
  public:
@@ -50,10 +54,9 @@ class Tracker {
  public:
   void addPoint(std::vector<float> pt, float loudness, int frameNumber);
   void tickUntil(int frameNumber);
-  std::vector<std::pair<std::vector<float>, float> > getSounds();
+  std::vector<Trackable> getSounds();
   
  private:
   int curFrameNumber = 0;
-  std::vector<std::pair<std::vector<float>, float> > sounds;
-  std::vector<int> soundFrameNumbers;  
+  std::vector<Trackable> sounds;
 };
