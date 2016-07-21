@@ -60,7 +60,7 @@ function loop() {
 
 	fadeAmt = (curFrame - val["last_frame"])/10.0; //one sixth of a second
 	ctx.fillStyle = "rgba(0, 0, 0, "+ (1-fadeAmt) +")";
-	ctx.fillRect(x, y, size, size);
+	ctx.fillRect(x-size/2, y-size/2, size, size);
 
     });
 
