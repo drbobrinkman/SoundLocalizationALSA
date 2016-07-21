@@ -109,6 +109,18 @@ void Server::operator() (http_server::request const &request,
     
     response = http_server::response::stock_reply
       (http_server::response::ok, response_str);
+  } else if(command.find("tracker.js") == 1) {
+    std::ifstream infile("tracker.js");
+    std::string response_str((std::istreambuf_iterator<char>(infile)),
+		    std::istreambuf_iterator<char>());
+    
+    response = http_server::response::stock_reply
+      (http_server::response::ok, response_str);
+
+    http_server::response_header content_header;
+    content_header.name = "Content-Type";
+    content_header.value = "application/javascript";
+    response.headers.push_back(content_header);
   } else {
     std::lock_guard<std::mutex> guard(g_buffer_mutex);
     
