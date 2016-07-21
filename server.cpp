@@ -29,7 +29,8 @@
  **/
 
 #include <mutex>
-
+#include <fstream>
+#include <streambuf>
 
 using namespace boost::network;
 
@@ -46,7 +47,6 @@ void Server::operator() (http_server::request const &request,
   } else if(command.find("sounds.json") == 1){
     std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
-    
     std::string response_str = "{\n";
     response_str += "    \"current_frame\": ";
     response_str += std::to_string(frameNumber);
@@ -102,6 +102,13 @@ void Server::operator() (http_server::request const &request,
     content_header.name = "Content-Type";
     content_header.value = "application/json";
     response.headers.push_back(content_header);
+  } else if(command.find("tracker.html") == 1) {
+    std::ifstream infile("tracker.html");
+    std::string response_str((std::istreambuf_iterator<char>(infile)),
+		    std::istreambuf_iterator<char>());
+    
+    response = http_server::response::stock_reply
+      (http_server::response::ok, response_str);
   } else {
     std::lock_guard<std::mutex> guard(g_buffer_mutex);
     

@@ -157,7 +157,7 @@ int main() {
     }
     s.putBuffer(m.buffer, loudness, loc, frameNumber);
 
-    if(loudness > 250.0f){
+    /*if(loudness > 250.0f){
       if(d > 1.80){
 	std::cout << "{" << std::setw(3) << (int)offsets[0][besti] << ", "
 		  << std::setw(3) << (int)offsets[1][bestj] << ", "
@@ -186,7 +186,7 @@ int main() {
 	<< entry[2] << ")"
 	<< " " << dist(cur_pt, last_pt)
 	<< std::endl;
-    }
+    }*/
 
     frameNumber++;
     last_pt = cur_pt;
