@@ -27,42 +27,44 @@ function fireloop(data) {
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    curFrame = theData["current_frame"];
-    
-    curTime = performance.now();
-    elapsed = curTime - startTime;
+    if(theData != null){
+	curFrame = theData["current_frame"];
+	
+	curTime = performance.now();
+	elapsed = curTime - startTime;
 
-    //First, draw the mic setup
-    ctx.fillStyle = "#007f00";
-    ctx.beginPath();
-    sideLength = 50;
-    rt3 = Math.sqrt(3);
-    ctx.moveTo(canvas.width/2, canvas.height/2 - sideLength/rt3);
-    ctx.lineTo(canvas.width/2 + sideLength/2,
-	       canvas.height/2 + sideLength/(2*rt3));
-    ctx.lineTo(canvas.width/2 - sideLength/2,
-	       canvas.height/2 + sideLength/(2*rt3));
-    ctx.closePath();
-    ctx.fill();  
+	//First, draw the mic setup
+	ctx.fillStyle = "#007f00";
+	ctx.beginPath();
+	sideLength = 50;
+	rt3 = Math.sqrt(3);
+	ctx.moveTo(canvas.width/2, canvas.height/2 - sideLength/rt3);
+	ctx.lineTo(canvas.width/2 + sideLength/2,
+		   canvas.height/2 + sideLength/(2*rt3));
+	ctx.lineTo(canvas.width/2 - sideLength/2,
+		   canvas.height/2 + sideLength/(2*rt3));
+	ctx.closePath();
+	ctx.fill();  
 
-    ctx.font = "12px Courier";
-    ctx.fillText("0", canvas.width/2 - 4,
-		 canvas.height/2 - sideLength/rt3 - 4);
-    
-    
-    $.each( theData["sounds"], function( key, val ) {
-	x = val["location"][0];
-	y = val["location"][1];
-	size = Math.sqrt(val["loudness"]);
+	ctx.font = "12px Courier";
+	ctx.fillText("0", canvas.width/2 - 4,
+		     canvas.height/2 - sideLength/rt3 - 4);
+	
+	
+	$.each( theData["sounds"], function( key, val ) {
+	    x = val["location"][0];
+	    y = val["location"][1];
+	    size = Math.sqrt(val["loudness"]);
 
-	x = canvas.width/2 + x*(canvas.width/4);
-	y = canvas.height/2 - y*(canvas.width/4); //Invert y axis
+	    x = canvas.width/2 + x*(canvas.width/4);
+	    y = canvas.height/2 - y*(canvas.width/4); //Invert y axis
 
-	fadeAmt = (curFrame - val["last_frame"])/10.0; //one sixth of a second
-	ctx.fillStyle = "rgba(0, 0, 0, "+ (1-fadeAmt) +")";
-	ctx.fillRect(x-size/2, y-size/2, size, size);
+	    fadeAmt = (curFrame - val["last_frame"])/10.0; //one sixth of a second
+	    ctx.fillStyle = "rgba(0, 0, 0, "+ (1-fadeAmt) +")";
+	    ctx.fillRect(x-size/2, y-size/2, size, size);
 
-    });
+	});
+    }
 
     ctx.font = "30px Arial";
     ctx.fillStyle = "black";
