@@ -27,12 +27,13 @@ function fireloop(data) {
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    curTime = performance.now();
+    elapsed = curTime - startTime;
+
+    
     if(theData != null){
 	curFrame = theData["current_frame"];
 	
-	curTime = performance.now();
-	elapsed = curTime - startTime;
-
 	//First, draw the mic setup
 	ctx.fillStyle = "#007f00";
 	ctx.beginPath();
