@@ -94,6 +94,38 @@ float diffWithOffset(char* buffer, unsigned int frames,
   return sqrt(avg);
 }
 
+float dotWithOffset(char* buffer, unsigned int frames,
+		     unsigned int ch1, unsigned int ch2,
+		     int offset){
+  unsigned int count = 0;
+  float total = 0.0f;
+
+  for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
+    count++;
+    
+    float val1 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*i + ch1));
+    float val2 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+offset) + ch2));
+
+    total += val1*val2;
+  }
+
+  return total/count;
+}
+
+std::vector<std::pair<float, float> > xcorr(char* buffer, unsigned int frames,
+					    unsigned int ch1, unsigned int ch2,
+					    int range){
+  std::vector<std::pair<float, float> > ret;
+  
+  for(int offset=-range; offset <= range; offset++){
+    ret.push_back(std::make_pair(offset,
+				 dotWithOffset(buffer, frames, ch1, ch2,
+						offset)));
+  }
+
+  return ret;
+}
+
 int findBestOffset(char* buffer, unsigned int frames,
 		   unsigned int ch1, unsigned int ch2){
   static float vals[SIZE];

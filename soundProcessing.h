@@ -30,8 +30,12 @@ std::vector<std::pair<float, float> >
 float diffWithOffset(char* buffer, unsigned int frames,
 		     unsigned int ch1, unsigned int ch2,
 		     int offset);
-//int findBestOffset(char* buffer, unsigned int frames,
-//		   unsigned int ch1, unsigned int ch2);
+float dotWithOffset(char* buffer, unsigned int frames,
+		     unsigned int ch1, unsigned int ch2,
+		     int offset);
+std::vector<std::pair<float, float> > xcorr(char* buffer, unsigned int frames,
+					    unsigned int ch1, unsigned int ch2,
+					    int range);
 
 float diffFourway(char* buffer, unsigned int frames,
 		  int offset[3]);

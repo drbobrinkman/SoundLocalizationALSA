@@ -21,6 +21,7 @@
 
 #include "server.h"
 #include "constants.h"
+#include "soundProcessing.h"
 
 /**
  * TODO: If I was a good person, we would possibly separate concerns
@@ -154,6 +155,29 @@ void Server::operator() (http_server::request const &request,
       }
     }
 
+    if(buffer.size() > 0){
+      for(int i=0; i<colors.size(); i++){
+	auto autocorr = xcorr(buffer.data(), buffer.size()/8,
+			      i, i, MAX_OFFSET);
+	float max = 1.0f;
+	for(int j=0; j < autocorr.size(); j++){
+	  float val = std::abs(autocorr[j].second);
+	  max = std::max(max, val);
+	}
+	response_str += "  <polyline points=\"";
+
+	int x = 0;
+	for(int j=0; j < autocorr.size(); j++){
+	  std::pair<float, float> val = autocorr[j];
+	  response_str += std::to_string(200+10*val.first) + ","
+	    + std::to_string(300+10*(val.second/max)) + " ";
+	}
+	response_str += "\" style=\"fill:none;stroke:";
+	response_str += colors[i];
+	response_str += ";stroke-width:1\" />\n";
+      }
+    }
+
     response_str += "<circle cx=\"200\" cy=\"198\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"202\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"198\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
@@ -161,7 +185,7 @@ void Server::operator() (http_server::request const &request,
     std::vector<Trackable> sounds
       = trck.getSoundsSince(frameNumberLastSentData);
 
-    for(int i=0; i < sounds.size(); i++){
+    /*    for(int i=0; i < sounds.size(); i++){
       if(sounds[i].loudness < SILENCE_LOUDNESS) continue;
       
       response_str += "<circle cx=\"";
@@ -171,7 +195,7 @@ void Server::operator() (http_server::request const &request,
       response_str += "\" r=\"";
       response_str += std::to_string(sounds[i].loudness/200);
       response_str += "\" fill=\"blue\"/>\n";
-    }
+      }*/
     
     response_str += "</svg>\n";
     
