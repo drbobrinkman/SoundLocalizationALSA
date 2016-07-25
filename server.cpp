@@ -128,7 +128,7 @@ void Server::operator() (http_server::request const &request,
     std::string response_str
       = "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"";
     response_str += std::to_string(4*(int)(0.5f + 16000.0f/60));
-    response_str += "\" height=\"400\">\n";
+    response_str += "\" height=\"800\">\n";
 
     std::vector<std::string> colors = {"red", "green", "blue", "black"};
 
@@ -155,10 +155,12 @@ void Server::operator() (http_server::request const &request,
       }
     }
 
+    int corr_x = 100;
+    int corr_y = 300;
     if(buffer.size() > 0){
       for(int i=0; i<colors.size(); i++){
 	auto autocorr = xcorr(buffer.data(), buffer.size()/8,
-			      i, i, MAX_OFFSET);
+			      i, i, 2*MAX_OFFSET);
 	float max = 1.0f;
 	for(int j=0; j < autocorr.size(); j++){
 	  float val = std::abs(autocorr[j].second);
@@ -169,8 +171,8 @@ void Server::operator() (http_server::request const &request,
 	int x = 0;
 	for(int j=0; j < autocorr.size(); j++){
 	  std::pair<float, float> val = autocorr[j];
-	  response_str += std::to_string(200+10*val.first) + ","
-	    + std::to_string(300-50*(val.second/max)) + " "; //invert y axis
+	  response_str += std::to_string(corr_x+5*val.first) + ","
+	    + std::to_string(corr_y-50*(val.second/max)) + " "; //invert y axis
 	}
 	response_str += "\" style=\"fill:none;stroke:";
 	response_str += colors[i];
@@ -179,17 +181,66 @@ void Server::operator() (http_server::request const &request,
     }
 
     response_str += "<polyline points=\"";
-    response_str += "100,300 300,300";
+    response_str += std::to_string(corr_x-100) + "," + std::to_string(corr_y)
+      + " " + std::to_string(corr_x+100) + "," + std::to_string(corr_y);
     response_str += "\" style=\"fill:none;stroke:";
     response_str += "black";
     response_str += ";stroke-width:1\" />\n";
 
     response_str += "<polyline points=\"";
-    response_str += "200,200 200,400";
+    response_str += std::to_string(corr_x) + "," + std::to_string(corr_y - 50)
+      + " " + std::to_string(corr_x) + "," + std::to_string(corr_y + 50);
     response_str += "\" style=\"fill:none;stroke:";
     response_str += "black";
     response_str += ";stroke-width:1\" />\n";
 
+    if(buffer.size() > 0){
+      for(int ch1=0; ch1<colors.size()-1; ch1++){
+	for(int ch2=ch1+1; ch2 < colors.size(); ch2++){
+	  auto autocorr = xcorr(buffer.data(), buffer.size()/8,
+				ch1, ch2, MAX_OFFSET);
+	  float max = 1.0f;
+	  for(int j=0; j < autocorr.size(); j++){
+	    float val = std::abs(autocorr[j].second);
+	    max = std::max(max, val);
+	  }
+	  response_str += "  <polyline points=\"";
+
+	  int x = 0;
+	  for(int j=0; j < autocorr.size(); j++){
+	    std::pair<float, float> val = autocorr[j];
+	    response_str += std::to_string(ch1*200 + corr_x+5*val.first) + ","
+	      + std::to_string(ch2*100 + corr_y-50*(val.second/max)) + " ";
+	  }
+	  response_str += "\" style=\"fill:none;stroke:";
+	  response_str += "black";
+	  response_str += ";stroke-width:1\" />\n";
+
+	  response_str += "<polyline points=\"";
+	  response_str += std::to_string(ch1*200 + corr_x-100) + ","
+	    + std::to_string(ch2*100 + corr_y)
+	    + " " + std::to_string(ch1*200 + corr_x+100) + ","
+	    + std::to_string(ch2*100 + corr_y);
+	  response_str += "\" style=\"fill:none;stroke:";
+	  response_str += "black";
+	  response_str += ";stroke-width:1\" />\n";
+	  
+	  response_str += "<polyline points=\"";
+	  response_str += std::to_string(ch1*200 + corr_x) + ","
+	    + std::to_string(ch2*100 + corr_y - 50)
+	    + " " + std::to_string(ch1*200 + corr_x) + ","
+	    + std::to_string(ch2*100 + corr_y + 50);
+	  response_str += "\" style=\"fill:none;stroke:";
+	  response_str += "black";
+	  response_str += ";stroke-width:1\" />\n";
+
+	  response_str += "<text x=\"" + std::to_string(ch1*200 + corr_x) +
+	    "\" y=\"" + std::to_string(ch2*100 + corr_y)
+	    + "\" fill=\"black\">" + std::to_string(ch1) + std::to_string(ch2)
+	    + "</text>\n";
+	}
+      }
+    }
     
     response_str += "<circle cx=\"200\" cy=\"198\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"202\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
