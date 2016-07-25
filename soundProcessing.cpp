@@ -138,30 +138,33 @@ float delay(char* buffer, unsigned int frames,
 	    unsigned int ch1, unsigned int ch2,
 	    int range){
   std::vector<std::pair<float, float> > corrs = xcorr(buffer, frames,
-						      ch1, ch2, range);
+						      ch1, ch2, range+2);
 
   std::vector<std::pair<float, float> > local_maxima;
   for(int i=2; i < corrs.size() - 2; i++){
     //Identify any local maxima
-    if(corrs[i-2].second < corrs[i].second &&
+    if(corrs[i-2].second <= corrs[i].second &&
        corrs[i-1].second <= corrs[i].second &&
        corrs[i+1].second <= corrs[i].second &&
-       corrs[i+2].second < corrs[i].second){
+       corrs[i+2].second <= corrs[i].second){
       local_maxima.push_back(corrs[i]);
     }
   }
 
+  //TODO: If we have a run of several straight lines, we want to keep only
+  // the middle one...
   if(local_maxima.size() > 0){
     int closest_index = 0;
     for(int i=1; i<local_maxima.size(); i++){
-      if(std::abs(local_maxima[i].first)
+      if(local_maxima[closest_index].second < 0.95 ||
+	 std::abs(local_maxima[i].first)
 	 < std::abs(local_maxima[closest_index].first)){
 	closest_index = i;
       }
     }
     return local_maxima[closest_index].first;
   } else {
-    return -10.0f;
+    return 0.0f;
   }
 }
 
