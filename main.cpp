@@ -82,16 +82,25 @@ void updateIPDiscoveryServer(){
 }
 
 int main() {
+  std::cout << "updating IP Discovery Server" << std::endl;
   updateIPDiscoveryServer();
   
   //Build the LUT before opening the mic
+  std::cout << "building LUT" << std::endl;
   LocationLUT& lut = LocationLUT::getInstance();
+
+  std::cout << "creating Tracker" << std::endl;
   Tracker& t = Tracker::getInstance();
+
+  std::cout << "creating Server" << std::endl;
   Server& s = Server::getInstance(t);
+
+  std::cout << "creating Microphone" << std::endl;
   Microphone& m = Microphone::getInstance();
   
   long frameNumber = 0;
-  
+
+  std::cout << "main loop starting" << std::endl;
   //Loop forever. Right now, must kill via ctrl-c
   while(s.isRunning()){
     int retVal;
@@ -116,109 +125,27 @@ int main() {
       }
     }
 
-    /*    std::cout << "delays: ";
-    float delays[3][4] = {
-      {0, 0, 0, 0},
-      {0, 0, 0, 0},
-      {0, 0, 0, 0}
-    };
-    for(int i=0; i<3; i++){
-      for(int j=i+1; j<4; j++){
-	delays[i][j] = delay(m.buffer.data(), m.frames, i, j, MAX_OFFSET + 1);
-	std::cout << delays[i][j] << ",";
-      }
-      std::cout << std::endl << "        ";
-      }*/
+    recenterAndRescale(m.buffer.data(), m.frames, l);
     
-    //Then rescale and recenter each signal, so all have
-    // mean of 0, and same stdev as loudest signal
-    //recenterAndRescale(m.buffer.data(), m.frames, l);
-
-    //Find the top 5 possible offsets for each subordinate channel
-    // with the lead channel.
-    /*std::priority_queue<std::pair<float, int> > best[4];
-    for(int i=0; i<4; i++){
-      findTopNOffsets(m.buffer.data(), m.frames, loudest, i, 5, best[i]);
-      }*/
-
-    //Prep the data to be passed to the diffFourWay.
-    /*std::vector<std::vector<int> > offsets;
-    for(int i=0; i<4; i++){
-      std::vector<int> t;
-      offsets.push_back(t);
-
-      while(!best[i].empty()){
-	if(i == loudest && offsets[i].size() > 0){
-	  //For the loudest signal, we want only the best
-	  // offset, which should be 0 ... it will be the
-	  // last one out of the priority queue though
-	  offsets[i].pop_back();
-	}
-	offsets[i].push_back((int)best[i].top().second);
-	best[i].pop();
-      }
-      }*/
-
-    //Now do a four-way alignment on the 5^3 candidate offsets
-    /*int besti = -1;
-    int bestj = -1;
-    int bestk = -1;
-    int bestl = -1;
-    float bestDiff = 1000000.0f;
-    for(int i=0; i<offsets[0].size(); i++){
-      for(int j=0; j<offsets[1].size(); j++){
-	for(int k=0; k<offsets[2].size(); k++){
-	  for(int l=0;l<offsets[3].size(); l++){
-	    int tryOffsets[4] = {offsets[0][i],
-				 offsets[1][j],
-				 offsets[2][k],
-				 offsets[3][l]};
-
-	    bool sane = true;
-	    //We cannot have any pairwise offsets that are more than MAX_OFFSET
-	    // or less than MIN_OFFSET
-	    for(int ii = 0; ii < 3; ii++){
-	      for(int jj = ii+1; jj < 4; jj++){
-		if(std::abs(tryOffsets[ii] - tryOffsets[jj]) >
-		   (int)(SENSOR_SPACING_SAMPLES+0.5)){
-		  sane = false;
-		}
-	      }
-	    }
-	    if(!sane) continue;
-	    
-	    float diff = diffFourway(m.buffer.data(), m.frames, tryOffsets);
-	    if(diff < bestDiff || besti == -1){
-	      besti = i;
-	      bestj = j;
-	      bestk = k;
-	      bestl = l;
-	      bestDiff = diff;
-	    }
-	  }
-	}
-      }
-    }
-    */
     //The starting value was determined empirically
     static float background_loudness = 100.0f;
 
+    float delays[4];
+    for(int i=0; i < 4; i++){
+      delays[i] = delay(m.buffer.data(), m.frames, loudest, i, MAX_OFFSET);
+    }
     //LUT assumes that stream 0 is the primary stream, so the offets
     // user are 1, 2, and 3 (not 0)
     //Now do a LUT lookup
     std::vector<float> loc = {
-      -delay(m.buffer.data(), m.frames, 0, 1, MAX_OFFSET),
-      -delay(m.buffer.data(), m.frames, 0, 2, MAX_OFFSET),
-      -delay(m.buffer.data(), m.frames, 0, 3, MAX_OFFSET)      
-      /*(float)(-offsets[1][bestj] + offsets[0][besti]),
-      (float)(-offsets[2][bestk] + offsets[0][besti]),
-      (float)(-offsets[3][bestl] + offsets[0][besti])*/
+      delays[0] - delays[1],
+      delays[0] - delays[2],
+      delays[0] - delays[3]
     };
     std::vector<float> entry = lut.get(loc);
 
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
     static std::vector<float> last_pt = cur_pt;
-
         
     float d = dist(cur_pt, last_pt);
     //If lookup failed we get back 10.0f, so skip this data point
@@ -226,37 +153,6 @@ int main() {
       t.addPoint(cur_pt, loudness, frameNumber);    
     }
     s.putBuffer(m.buffer, loudness, loc, frameNumber);
-
-    /*if(loudness > 250.0f){
-      if(d > 1.80){
-	std::cout << "{" << std::setw(3) << (int)offsets[0][besti] << ", "
-		  << std::setw(3) << (int)offsets[1][bestj] << ", "
-		  << std::setw(3) << (int)offsets[2][bestk] << ", "
-		  << std::setw(3) << (int)offsets[3][bestl] << "}"
-		  << std::endl;
-      }
-
-      std::cout << std::fixed << std::setprecision(2) << std::setw(7)
-		<< loudness << " " << bestDiff;
-      
-      int i=0;
-      for(;i<loudness;i+=200){
-	std::cout << "=";
-      }
-      for(;i<3000;i+=200){
-	std::cout << " ";
-      }
-      
-      std::cout
-	<< "[" << loc[0] << ", "
-	<< loc[1] << ", "
-	<< loc[2] << "] "
-	<< "(" << entry[0] << ", "
-	<< entry[1] << ", "
-	<< entry[2] << ")"
-	<< " " << dist(cur_pt, last_pt)
-	<< std::endl;
-    }*/
 
     frameNumber++;
     last_pt = cur_pt;
