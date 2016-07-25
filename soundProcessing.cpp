@@ -100,11 +100,19 @@ float dotWithOffset(char* buffer, unsigned int frames,
   unsigned int count = 0;
   float total = 0.0f;
 
-  for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
+  int ch1offset = 0;
+  int ch2offset = 0;
+  if(offset >= 0){
+    ch2offset = offset;
+  } else {
+    ch1offset = -offset;
+  }
+  
+  for(int i=0; i < frames-std::abs(offset); i++){
     count++;
     
-    float val1 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*i + ch1));
-    float val2 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+offset) + ch2));
+    float val1 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+ch1offset)+ch1));
+    float val2 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+ch2offset)+ch2));
 
     total += val1*val2;
   }

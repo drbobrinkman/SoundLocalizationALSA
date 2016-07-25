@@ -198,7 +198,7 @@ void Server::operator() (http_server::request const &request,
       for(int ch1=0; ch1<colors.size()-1; ch1++){
 	for(int ch2=ch1+1; ch2 < colors.size(); ch2++){
 	  auto autocorr = xcorr(buffer.data(), buffer.size()/8,
-				ch1, ch2, MAX_OFFSET);
+				ch1, ch2, 2*MAX_OFFSET);
 	  float max = 1.0f;
 	  for(int j=0; j < autocorr.size(); j++){
 	    float val = std::abs(autocorr[j].second);
