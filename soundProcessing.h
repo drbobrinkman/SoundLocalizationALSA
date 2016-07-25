@@ -36,6 +36,9 @@ float dotWithOffset(char* buffer, unsigned int frames,
 std::vector<std::pair<float, float> > xcorr(char* buffer, unsigned int frames,
 					    unsigned int ch1, unsigned int ch2,
 					    int range);
+float delay(char* buffer, unsigned int frames,
+	    unsigned int ch1, unsigned int ch2,
+	    int range);
 
 float diffFourway(char* buffer, unsigned int frames,
 		  int offset[3]);

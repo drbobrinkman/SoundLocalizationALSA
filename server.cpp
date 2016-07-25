@@ -234,6 +234,13 @@ void Server::operator() (http_server::request const &request,
 	  response_str += "black";
 	  response_str += ";stroke-width:1\" />\n";
 
+	  float delay_ = delay(buffer.data(), buffer.size()/8, ch1, ch2,
+			      MAX_OFFSET);
+	  response_str += "<circle cx=\""
+	    + std::to_string(ch1*200 + corr_x + delay_*5) +
+	    "\" cy=\"" + std::to_string(ch2*100 + corr_y)
+	    + "\" fill=\"green\" r=\"2\"/>\n";
+	  
 	  response_str += "<text x=\"" + std::to_string(ch1*200 + corr_x) +
 	    "\" y=\"" + std::to_string(ch2*100 + corr_y)
 	    + "\" fill=\"black\">" + std::to_string(ch1) + std::to_string(ch2)

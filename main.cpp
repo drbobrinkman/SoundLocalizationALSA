@@ -116,19 +116,33 @@ int main() {
       }
     }
 
+    /*    std::cout << "delays: ";
+    float delays[3][4] = {
+      {0, 0, 0, 0},
+      {0, 0, 0, 0},
+      {0, 0, 0, 0}
+    };
+    for(int i=0; i<3; i++){
+      for(int j=i+1; j<4; j++){
+	delays[i][j] = delay(m.buffer.data(), m.frames, i, j, MAX_OFFSET + 1);
+	std::cout << delays[i][j] << ",";
+      }
+      std::cout << std::endl << "        ";
+      }*/
+    
     //Then rescale and recenter each signal, so all have
     // mean of 0, and same stdev as loudest signal
-    recenterAndRescale(m.buffer.data(), m.frames, l);
+    //recenterAndRescale(m.buffer.data(), m.frames, l);
 
     //Find the top 5 possible offsets for each subordinate channel
     // with the lead channel.
-    std::priority_queue<std::pair<float, int> > best[4];
+    /*std::priority_queue<std::pair<float, int> > best[4];
     for(int i=0; i<4; i++){
       findTopNOffsets(m.buffer.data(), m.frames, loudest, i, 5, best[i]);
-    }
+      }*/
 
     //Prep the data to be passed to the diffFourWay.
-    std::vector<std::vector<int> > offsets;
+    /*std::vector<std::vector<int> > offsets;
     for(int i=0; i<4; i++){
       std::vector<int> t;
       offsets.push_back(t);
@@ -143,10 +157,10 @@ int main() {
 	offsets[i].push_back((int)best[i].top().second);
 	best[i].pop();
       }
-    }
+      }*/
 
     //Now do a four-way alignment on the 5^3 candidate offsets
-    int besti = -1;
+    /*int besti = -1;
     int bestj = -1;
     int bestk = -1;
     int bestl = -1;
@@ -185,7 +199,7 @@ int main() {
 	}
       }
     }
-
+    */
     //The starting value was determined empirically
     static float background_loudness = 100.0f;
 
@@ -193,9 +207,12 @@ int main() {
     // user are 1, 2, and 3 (not 0)
     //Now do a LUT lookup
     std::vector<float> loc = {
-      (float)(-offsets[1][bestj] + offsets[0][besti]),
+      -delay(m.buffer.data(), m.frames, 0, 1, MAX_OFFSET),
+      -delay(m.buffer.data(), m.frames, 0, 2, MAX_OFFSET),
+      -delay(m.buffer.data(), m.frames, 0, 3, MAX_OFFSET)      
+      /*(float)(-offsets[1][bestj] + offsets[0][besti]),
       (float)(-offsets[2][bestk] + offsets[0][besti]),
-      (float)(-offsets[3][bestl] + offsets[0][besti])
+      (float)(-offsets[3][bestl] + offsets[0][besti])*/
     };
     std::vector<float> entry = lut.get(loc);
 
