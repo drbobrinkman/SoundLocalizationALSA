@@ -170,7 +170,7 @@ void Server::operator() (http_server::request const &request,
 	for(int j=0; j < autocorr.size(); j++){
 	  std::pair<float, float> val = autocorr[j];
 	  response_str += std::to_string(200+10*val.first) + ","
-	    + std::to_string(300+10*(val.second/max)) + " ";
+	    + std::to_string(300-50*(val.second/max)) + " "; //invert y axis
 	}
 	response_str += "\" style=\"fill:none;stroke:";
 	response_str += colors[i];
@@ -178,6 +178,19 @@ void Server::operator() (http_server::request const &request,
       }
     }
 
+    response_str += "<polyline points=\"";
+    response_str += "100,300 300,300";
+    response_str += "\" style=\"fill:none;stroke:";
+    response_str += "black";
+    response_str += ";stroke-width:1\" />\n";
+
+    response_str += "<polyline points=\"";
+    response_str += "200,200 200,400";
+    response_str += "\" style=\"fill:none;stroke:";
+    response_str += "black";
+    response_str += ";stroke-width:1\" />\n";
+
+    
     response_str += "<circle cx=\"200\" cy=\"198\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"202\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
     response_str += "<circle cx=\"198\" cy=\"200\" r=\"2\" fill=\"black\"/>\n";
