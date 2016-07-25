@@ -152,6 +152,9 @@ void Server::operator() (http_server::request const &request,
 	response_str += "\" style=\"fill:none;stroke:";
 	response_str += colors[i];
 	response_str += ";stroke-width:1\" />\n";
+	response_str += "<text x=\"0\" y=\"30\" style=\"black\">";
+	response_str += std::to_string(loudness);
+	response_str += "</text>\n";
       }
     }
 
@@ -234,6 +237,25 @@ void Server::operator() (http_server::request const &request,
 	  response_str += "black";
 	  response_str += ";stroke-width:1\" />\n";
 
+	  response_str += "<polyline points=\"";
+	  response_str += std::to_string(ch1*200 + corr_x + SENSOR_SPACING_SAMPLES*5) + ","
+	    + std::to_string(ch2*100 + corr_y - 50)
+	    + " " + std::to_string(ch1*200 + corr_x + SENSOR_SPACING_SAMPLES*5) + ","
+	    + std::to_string(ch2*100 + corr_y + 50);
+	  response_str += "\" style=\"fill:none;stroke:";
+	  response_str += "gray";
+	  response_str += ";stroke-width:1\" />\n";
+
+	  response_str += "<polyline points=\"";
+	  response_str += std::to_string(ch1*200 + corr_x - SENSOR_SPACING_SAMPLES*5) + ","
+	    + std::to_string(ch2*100 + corr_y - 50)
+	    + " " + std::to_string(ch1*200 + corr_x - SENSOR_SPACING_SAMPLES*5) + ","
+	    + std::to_string(ch2*100 + corr_y + 50);
+	  response_str += "\" style=\"fill:none;stroke:";
+	  response_str += "gray";
+	  response_str += ";stroke-width:1\" />\n";
+
+	  
 	  float delay_ = delay(buffer.data(), buffer.size()/8, ch1, ch2,
 			      MAX_OFFSET);
 	  response_str += "<circle cx=\""
@@ -293,9 +315,15 @@ void Server::run(){
   server_.run();
 }
 
-Server::Server(Tracker& itrk) : t(&Server::run, this), options(*this),
-		   server_(options.address("0.0.0.0")
-			   .port("8000")), trck(itrk){
+//TODO: There is some race condition here ... segfaults sometimes,
+// not others
+Server::Server(Tracker& itrk) :
+  options(*this),
+  server_(options.address("0.0.0.0").port("8000")),
+  trck(itrk),
+  t(&Server::run, this)
+{
+  std::cout << "About to detach" << std::endl;
   t.detach();
 }
 
