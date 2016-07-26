@@ -143,7 +143,8 @@ float delay(char* buffer, unsigned int frames,
   std::vector<std::pair<float, float> > local_maxima;
   for(int i=2; i < corrs.size() - 2; i++){
     //Identify any local maxima
-    if(corrs[i-2].second <= corrs[i].second &&
+    if(corrs[i].second > 0.97 &&
+       corrs[i-2].second <= corrs[i].second &&
        corrs[i-1].second <= corrs[i].second &&
        corrs[i+1].second <= corrs[i].second &&
        corrs[i+2].second <= corrs[i].second){
@@ -156,8 +157,7 @@ float delay(char* buffer, unsigned int frames,
   if(local_maxima.size() > 0){
     int closest_index = 0;
     for(int i=1; i<local_maxima.size(); i++){
-      if(local_maxima[closest_index].second < 0.95 ||
-	 std::abs(local_maxima[i].first)
+      if(std::abs(local_maxima[i].first)
 	 < std::abs(local_maxima[closest_index].first)){
 	closest_index = i;
       }
@@ -238,8 +238,8 @@ float diffFourway(char* buffer, unsigned int frames,
   
 }
 
-void recenterAndRescale(char* buffer, unsigned int frames,
-			std::vector<std::pair<float, float> > stats){
+void recenter(char* buffer, unsigned int frames,
+	      std::vector<std::pair<float, float> > stats){
   float scale[NUM_CHANNELS] = {1.0f, 1.0f, 1.0f, 1.0f};
   float amax = stats[0].second;
   for(int i=1; i<NUM_CHANNELS; i++){
@@ -259,7 +259,7 @@ void recenterAndRescale(char* buffer, unsigned int frames,
       int offset = i*NUM_CHANNELS + j;
       float val = (float)*(((int16_t*)buffer)+offset);
       val = val - stats[j].first;
-      val = val*scale[j];
+      //val = val*scale[j];
       *(((int16_t*)buffer)+offset) = (int16_t)(val+0.5);
     }
   }

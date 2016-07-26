@@ -19,47 +19,6 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
-/**
- * Portions of this code come from http://www.linuxjournal.com/node/6735/print
- * Tranter, Jeff. "Introduction to Sound Programming with ALSA." Linux Journal,
- *  Sep 30, 2004.
- **/
-
 #pragma once
 
-/* Use the newer ALSA API */
-#define ALSA_PCM_NEW_HW_PARAMS_API
-#include <alsa/asoundlib.h>
-
-#include <vector>
-
-constexpr int BYTES_PER_CHANNEL = 2;
-constexpr int NUM_CHANNELS = 4;
-
-class Microphone {
- public:
-  static Microphone& getInstance(){
-    static Microphone instance;
-    return instance;
-  }
-  
- private:
-  //This is to make sure we don't try to make Microphones using new and
-  // delete
-  Microphone();
-  ~Microphone();
-
- public:
-  //This is to make sure we don't forget to declare our variables
-  // as references
-  Microphone(Microphone const&) = delete;
-  void operator=(Microphone const&) = delete;
-  
-  snd_pcm_t *handle;
-  snd_pcm_hw_params_t *params;
-  snd_pcm_uframes_t frames;
-  
-  std::vector<char> buffer;
-  //Note: Buffer size should be frames*8, because we are using
-  // 16-bit format with 4 channels
-};
+void updateIPDiscoveryServer();

@@ -28,7 +28,7 @@
 constexpr float CLUSTER_DISTANCE = 0.5f;
 constexpr float SMOOTHING_FACTOR = 1.0f/6.0f;
 constexpr float TIMEOUT_SECONDS = 1.0f;
-constexpr float FPS = 60.0f;
+constexpr float FPS = TARGET_FRAME_RATE;
 constexpr float TIMEOUT_FRAMES = TIMEOUT_SECONDS * FPS;
 
 std::mutex g_sounds_mutex;

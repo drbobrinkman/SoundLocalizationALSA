@@ -27,6 +27,7 @@
 #include <iostream>
 
 #include "microphone.h"
+#include "constants.h"
 
 Microphone::Microphone() {
   int rc;
@@ -63,7 +64,7 @@ Microphone::Microphone() {
   snd_pcm_hw_params_set_rate_near(handle,
 				  params, &val, &dir);
 
-  frames = (int)(0.5 + (double)val/targetFrameRate);
+  frames = (int)(0.5 + (double)val/TARGET_FRAME_RATE);
   snd_pcm_hw_params_set_period_size_near(handle, params,
 					 &frames, &dir);
   /* Write the parameters to the driver */

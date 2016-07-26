@@ -127,7 +127,7 @@ void Server::operator() (http_server::request const &request,
     
     std::string response_str
       = "<svg  xmlns=\"http://www.w3.org/2000/svg\" width=\"";
-    response_str += std::to_string(4*(int)(0.5f + 16000.0f/60));
+    response_str += std::to_string(4*(int)(0.5f + 16000.0f/TARGET_FRAME_RATE));
     response_str += "\" height=\"800\">\n";
 
     std::vector<std::string> colors = {"red", "green", "blue", "black"};
