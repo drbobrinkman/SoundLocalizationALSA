@@ -22,6 +22,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <fstream>
 
 #include "microphone.h"
 #include "locationlut.h"
@@ -77,26 +78,12 @@ int main() {
     //recenter(m.buffer, l);
     
     std::pair<float, float> delays[4][4];
-    bool badthing = false;
     for(int j=0; j < 4; j++){
       for(int i=0; i < 4; i++){
 	delays[i][j] = delay(m.buffer, i, j, 2*SENSOR_SPACING_SAMPLES);
-	if(delays[i][j].first < -500) badthing = true;
       }
     }
 
-    if(loudness > 300){
-      std::cout << "Profile:" << std::endl;
-      for(int ch1=0; ch1<4; ch1++){
-	for(int ch2=0; ch2<4; ch2++){
-	  for(int mid=0; mid<4; mid++){
-	    std::cout << std::setw(3)
-		      << delays[ch1][mid].first + delays[mid][ch2].first << ", ";
-	  }
-	}
-	std::cout << std::endl;
-      }
-    }
     //LUT assumes that stream 0 is the primary stream, so the offets
     // user are 1, 2, and 3 (not 0)
     //Now do a LUT lookup
@@ -106,11 +93,6 @@ int main() {
       -delays[0][3].first
     };
 
-    for(int i=0; i<loc.size(); i ++){
-      if(loc[i] < -500){
-	loc[i] = 0;
-      }
-    }
     std::vector<float> entry = lut.get(loc);
 
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
@@ -121,11 +103,7 @@ int main() {
     if(cur_pt[0] < 2.0f){
       t.addPoint(cur_pt, loudness, frameNumber);    
     }
-    std::cout << delays[0][1].second << " "
-	      << delays[0][2].second << " "
-	      << delays[0][3].second << " "
-	      << std::endl;
-    
+
     s.putBuffer(m.buffer, loudness, loc, frameNumber);
     
     frameNumber++;

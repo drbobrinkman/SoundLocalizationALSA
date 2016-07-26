@@ -44,4 +44,4 @@ constexpr float TAN_60 = 1.73205080757f;
 
 constexpr float SILENCE_LOUDNESS = 250.0f;
 
-constexpr float TARGET_FRAME_RATE = 30.0f;
+constexpr float TARGET_FRAME_RATE = 15.0f;
