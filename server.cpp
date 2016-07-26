@@ -324,7 +324,8 @@ void Server::run(){
 Server::Server(Tracker& itrk) : trck(itrk)
 {
   static http_server::options options_(*this);
-  static http_server server_(options_.address("0.0.0.0").port("8000"));
+  static http_server server_(options_.address("0.0.0.0").port("8000")
+			     .reuse_address(true));
   p_server = &server_;
 
   static std::thread t_(&Server::run, this);
@@ -332,6 +333,9 @@ Server::Server(Tracker& itrk) : trck(itrk)
 }
 
 Server::~Server(){
+  if(p_server){
+    p_server->stop();
+  }
 }
 
 void Server::putBuffer(std::vector<int16_t> &ibuffer, float iloudness,
