@@ -49,8 +49,8 @@ std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt){
 
 constexpr int SIZE = MAX_OFFSET - MIN_OFFSET;
 
-std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer,
-						      unsigned int frames){
+std::vector<std::pair<float, float> >
+meansAndStdDevs(const std::vector<int16_t>& buffer){
   float total[4] = {0.0f, 0.0f, 0.0f, 0.0f};
   float totalSq[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -58,10 +58,9 @@ std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer,
   //This assumes that the input format is S16_LE
 
   int channel = 0;
-  for(int i = 0; i < frames*NUM_CHANNELS*BYTES_PER_CHANNEL;
-      i += BYTES_PER_CHANNEL){
+  for(int i = 0; i < buffer.size(); i++){
     count[channel]++;
-    float val = (float)*(int16_t*)(buffer + i);
+    float val = (float)buffer[i];
     total[channel] += val;
     totalSq[channel] += val*val;
     channel = (channel+1)%4;
@@ -76,17 +75,18 @@ std::vector<std::pair<float, float> > meansAndStdDevs(char* buffer,
   return ret;
 }
 
-float diffWithOffset(char* buffer, unsigned int frames,
+float diffWithOffset(const std::vector<int16_t>& buffer,
 		     unsigned int ch1, unsigned int ch2,
 		     int offset){
   unsigned int count = 0;
   float total = 0.0f;
-
+  unsigned int frames = buffer.size() / NUM_CHANNELS;
+  
   for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
     count++;
     
-    float val1 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*i + ch1));
-    float val2 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+offset) + ch2));
+    float val1 = (float)buffer[NUM_CHANNELS*i + ch1];
+    float val2 = (float)buffer[NUM_CHANNELS*(i+offset) + ch2];
 
     total += (val1-val2)*(val1-val2);
   }
@@ -95,11 +95,12 @@ float diffWithOffset(char* buffer, unsigned int frames,
   return sqrt(avg);
 }
 
-float dotWithOffset(char* buffer, unsigned int frames,
+float dotWithOffset(const std::vector<int16_t>& buffer,
 		     unsigned int ch1, unsigned int ch2,
 		     int offset){
   unsigned int count = 0;
   float total = 0.0f;
+  unsigned int frames = buffer.size() / NUM_CHANNELS;
 
   int ch1offset = 0;
   int ch2offset = 0;
@@ -112,8 +113,8 @@ float dotWithOffset(char* buffer, unsigned int frames,
   for(int i=0; i < frames-std::abs(offset); i++){
     count++;
     
-    float val1 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+ch1offset)+ch1));
-    float val2 = (float)*(((int16_t*)buffer)+(NUM_CHANNELS*(i+ch2offset)+ch2));
+    float val1 = (float)buffer[NUM_CHANNELS*(i+ch1offset)+ch1];
+    float val2 = (float)buffer[NUM_CHANNELS*(i+ch2offset)+ch2];
 
     total += val1*val2;
   }
@@ -121,70 +122,60 @@ float dotWithOffset(char* buffer, unsigned int frames,
   return total/count;
 }
 
-std::vector<std::pair<float, float> > xcorr(char* buffer, unsigned int frames,
-					    unsigned int ch1, unsigned int ch2,
-					    int range){
+std::vector<std::pair<float, float> >
+xcorr(const std::vector<int16_t>& buffer,
+      unsigned int ch1, unsigned int ch2,
+      int range){
   std::vector<std::pair<float, float> > ret;
   
   for(int offset=-range; offset <= range; offset++){
     ret.push_back(std::make_pair(offset,
-				 dotWithOffset(buffer, frames, ch1, ch2,
+				 dotWithOffset(buffer, ch1, ch2,
 						offset)));
   }
 
   return ret;
 }
 
-std::pair<float, float> delay(char* buffer, unsigned int frames,
-	    unsigned int ch1, unsigned int ch2,
-	    int range){
-  std::vector<std::pair<float, float> > corrs = xcorr(buffer, frames,
+std::pair<float, float> delay(const std::vector<int16_t>& buffer,
+			      unsigned int ch1, unsigned int ch2,
+			      int range){
+  std::vector<std::pair<float, float> > corrs = xcorr(buffer,
 						      ch1, ch2, range+2);
 
-  float ac1 = dotWithOffset(buffer, frames,
+  float ac1 = dotWithOffset(buffer,
 			    ch1, ch1, 0);
-  float ac2 = dotWithOffset(buffer, frames,
+  float ac2 = dotWithOffset(buffer, 
 			    ch2, ch2, 0);
   
-  std::vector<std::pair<float, float> > local_maxima;
-  for(int i=2; i < corrs.size() - 2; i++){
-    //Identify any local maxima
-    if(corrs[i].second > 0.97 &&
-       corrs[i-2].second <= corrs[i].second &&
-       corrs[i-1].second <= corrs[i].second &&
-       corrs[i+1].second <= corrs[i].second &&
-       corrs[i+2].second <= corrs[i].second){
-      local_maxima.push_back(corrs[i]);
+  int maxOffset = 0;
+  std::pair<float, float> maxVal = corrs[0];
+  
+  for(int i=1; i<corrs.size(); i++){
+    if(corrs[i].second > maxVal.second){
+      maxVal = corrs[i];
+      maxOffset = i;
+    } else if(corrs[i].second == maxVal.second &&
+	      std::abs(corrs[i].first) < std::abs(maxVal.first)){
+      maxVal = corrs[i];
+      maxOffset = i;
     }
   }
 
-  //TODO: If we have a run of several straight lines, we want to keep only
-  // the middle one...
-  if(local_maxima.size() > 0){
-    int closest_index = 0;
-    for(int i=1; i<local_maxima.size(); i++){
-      if(std::abs(local_maxima[i].first)
-	 < std::abs(local_maxima[closest_index].first)){
-	closest_index = i;
-      }
-    }
-    return std::make_pair(local_maxima[closest_index].first,
-			  local_maxima[closest_index].second/
-			  std::sqrt(ac1*ac2));
-  } else {
-    return std::make_pair(-1000.0f, 10.0f);
-  }
+  return std::make_pair(maxVal.first,
+			maxVal.second/
+			std::sqrt(ac1*ac2));
 }
 
 
-int findBestOffset(char* buffer, unsigned int frames,
+int findBestOffset(const std::vector<int16_t>& buffer, 
 		   unsigned int ch1, unsigned int ch2){
   static float vals[SIZE];
   
   int bestOffset = MIN_OFFSET;
-  float bestVal = diffWithOffset(buffer, frames, ch1, ch2, bestOffset);
+  float bestVal = diffWithOffset(buffer, ch1, ch2, bestOffset);
   for(int offset=MIN_OFFSET+1; offset < MAX_OFFSET; offset++){
-    vals[offset - MIN_OFFSET]= diffWithOffset(buffer, frames, ch1, ch2,
+    vals[offset - MIN_OFFSET]= diffWithOffset(buffer, ch1, ch2,
 					      offset);
     if(vals[offset - MIN_OFFSET] < bestVal){
       bestVal = vals[offset - MIN_OFFSET];
@@ -195,42 +186,45 @@ int findBestOffset(char* buffer, unsigned int frames,
   return bestOffset;
 }
 
-void findTopNOffsets(char* buffer, unsigned int frames,
+void findTopNOffsets(const std::vector<int16_t>& buffer,
 	      unsigned int ch1, unsigned int ch2, int n,
 	      std::priority_queue<std::pair<float, int> >& outList){
   while(!outList.empty()){
     outList.pop();
   }
 
+  unsigned int frames = buffer.size() / NUM_CHANNELS;
+
   //Compute the first three, and put them in the heap
   int i = 0;
   for(; i < n && i < frames; i++){
     int offset = MIN_OFFSET + i;
-    float val = diffWithOffset(buffer, frames, ch1, ch2, offset);
+    float val = diffWithOffset(buffer, ch1, ch2, offset);
     outList.push(std::make_pair(val, offset));
   }
 
   //Now make a new one, then pop the worse one, until done
   for(; i < MAX_OFFSET - MIN_OFFSET; i++){
     int offset = MIN_OFFSET + i;
-    float val = diffWithOffset(buffer, frames, ch1, ch2, offset);
+    float val = diffWithOffset(buffer, ch1, ch2, offset);
     outList.push(std::make_pair(val, offset));
     outList.pop();
   }
 }
 
-float diffFourway(char* buffer, unsigned int frames,
+float diffFourway(const std::vector<int16_t>& buffer, 
 		  int offset[4]){
   unsigned int count = 0;
   float total = 0.0f;
   float val[4];
-  
+
+  unsigned int frames = buffer.size() / NUM_CHANNELS;
+
   for(int i=MAX_OFFSET; i < frames-MAX_OFFSET; i++){
     count++;
     
     for(int j=0; j<4; j++){
-      val[j] = (float)*(((int16_t*)buffer)
-			+(NUM_CHANNELS*(i+offset[j]) + j));
+      val[j] = (float)buffer[NUM_CHANNELS*(i+offset[j]) + j];
     }
 
     for(int ch1=0; ch1 < 3; ch1++){
@@ -246,7 +240,7 @@ float diffFourway(char* buffer, unsigned int frames,
   
 }
 
-void recenter(char* buffer, unsigned int frames,
+void recenter(std::vector<int16_t>& buffer, 
 	      std::vector<std::pair<float, float> > stats){
   float scale[NUM_CHANNELS] = {1.0f, 1.0f, 1.0f, 1.0f};
   float amax = stats[0].second;
@@ -261,14 +255,16 @@ void recenter(char* buffer, unsigned int frames,
       scale[i] = amax/stats[i].second;
     }
   }
-  
+
+  unsigned int frames = buffer.size() / NUM_CHANNELS;
+
   for(int i=0; i<frames; i++){
     for(int j=0; j<NUM_CHANNELS; j++){
       int offset = i*NUM_CHANNELS + j;
-      float val = (float)*(((int16_t*)buffer)+offset);
+      float val = (float)buffer[offset];
       val = val - stats[j].first;
       //val = val*scale[j];
-      *(((int16_t*)buffer)+offset) = (int16_t)(val+0.5);
+      buffer[offset] = (int16_t)(val+0.5);
     }
   }
 }

@@ -32,8 +32,8 @@
 #include <alsa/asoundlib.h>
 
 #include <vector>
+#include <cstdint>
 
-constexpr int BYTES_PER_CHANNEL = 2;
 constexpr int NUM_CHANNELS = 4;
 
 class Microphone {
@@ -59,7 +59,7 @@ class Microphone {
   snd_pcm_hw_params_t *params;
   snd_pcm_uframes_t frames;
   
-  std::vector<char> buffer;
+  std::vector<int16_t> buffer;
   //Note: Buffer size should be frames*8, because we are using
   // 16-bit format with 4 channels
 };

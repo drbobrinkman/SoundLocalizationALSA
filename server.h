@@ -23,6 +23,7 @@
 
 #include <thread>
 #include <vector>
+#include <cstdint>
 
 #include "tracker.h"
 
@@ -57,12 +58,12 @@ class Server {
   void operator=(Server const&) = delete;
 
   bool isRunning();
-  void putBuffer(std::vector<char> const &ibuffer, float iloudness,
+  void putBuffer(std::vector<int16_t> &ibuffer, float iloudness,
 		 std::vector<float> loc,
 		 //std::vector<Trackable> isounds,
 		 unsigned long iframeNum);
 
-  std::vector<char> buffer;
+  std::vector<int16_t> buffer;
   std::vector<float> offsets;
   //std::vector<Trackable> sounds;
   float loudness;

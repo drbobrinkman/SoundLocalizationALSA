@@ -57,14 +57,13 @@ int main() {
 
     //First, read data
     //Should block if data not yet ready
-    retVal = snd_pcm_readi(m.handle, m.buffer.data(), m.frames);
+    retVal = snd_pcm_readi(m.handle, (char*)m.buffer.data(), m.frames);
     if(retVal < 0){
       throw std::string("microphone read failed: ") + snd_strerror(retVal);
     }
 
     //Next, calculate mean and stdev for rescaling and centering signals
-    std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer.data(),
-							      m.frames);
+    std::vector<std::pair<float, float> > l = meansAndStdDevs(m.buffer);
     //Find the loudness of the loudest channel
     float loudness = l[0].second;
     int loudest = 0;
@@ -75,13 +74,13 @@ int main() {
       }
     }
 
-    //recenter(m.buffer.data(), m.frames, l);
+    //recenter(m.buffer, l);
     
     std::pair<float, float> delays[4][4];
     bool badthing = false;
     for(int j=0; j < 4; j++){
       for(int i=0; i < 4; i++){
-	delays[i][j] = delay(m.buffer.data(), m.frames, i, j, 2*SENSOR_SPACING_SAMPLES);
+	delays[i][j] = delay(m.buffer, i, j, 2*SENSOR_SPACING_SAMPLES);
 	if(delays[i][j].first < -500) badthing = true;
       }
     }
@@ -102,10 +101,16 @@ int main() {
     // user are 1, 2, and 3 (not 0)
     //Now do a LUT lookup
     std::vector<float> loc = {
-      delays[0][1].first,
-      delays[0][2].first,
-      delays[0][3].first
+      -delays[0][1].first,
+      -delays[0][2].first,
+      -delays[0][3].first
     };
+
+    for(int i=0; i<loc.size(); i ++){
+      if(loc[i] < -500){
+	loc[i] = 0;
+      }
+    }
     std::vector<float> entry = lut.get(loc);
 
     std::vector<float> cur_pt(entry.begin(), entry.begin()+3);
@@ -121,18 +126,7 @@ int main() {
 	      << delays[0][3].second << " "
 	      << std::endl;
     
-    if(badthing && loudness > 300){
-      std::cout << delays[0][1].second << " "
-		<< delays[0][2].second << " "
-		<< delays[0][3].second << " "
-		<< std::endl;
-      for(int i=0; i<loc.size(); i ++){
-	if(loc[i] < -500){
-	  loc[i] = 0;
-	}
-      }
-      s.putBuffer(m.buffer, loudness, loc, frameNumber);
-    }
+    s.putBuffer(m.buffer, loudness, loc, frameNumber);
     
     frameNumber++;
     last_pt = cur_pt;

@@ -77,7 +77,7 @@ Microphone::Microphone() {
   /*Get frame size after init */
   snd_pcm_hw_params_get_period_size(params,
 				    &frames, &dir);
-  int size = frames*BYTES_PER_CHANNEL*NUM_CHANNELS;
+  int size = frames*NUM_CHANNELS;
   buffer.resize(size, 0);
 }
 

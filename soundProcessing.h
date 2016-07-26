@@ -24,29 +24,46 @@
 #include <queue>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 std::vector<std::pair<float, float> >
-  meansAndStdDevs(char* buffer, unsigned int frames);
-float diffWithOffset(char* buffer, unsigned int frames,
-		     unsigned int ch1, unsigned int ch2,
-		     int offset);
-float dotWithOffset(char* buffer, unsigned int frames,
-		     unsigned int ch1, unsigned int ch2,
-		     int offset);
-std::vector<std::pair<float, float> > xcorr(char* buffer, unsigned int frames,
-					    unsigned int ch1, unsigned int ch2,
-					    int range);
-std::pair<float, float> delay(char* buffer, unsigned int frames,
-	    unsigned int ch1, unsigned int ch2,
-	    int range);
+meansAndStdDevs(const std::vector<int16_t>& buffer);
 
-float diffFourway(char* buffer, unsigned int frames,
-		  int offset[3]);
+float
+diffWithOffset(const std::vector<int16_t>& buffer,
+	       unsigned int ch1, unsigned int ch2,
+	       int offset);
 
-void findTopNOffsets(char* buffer, unsigned int frames,
-	      unsigned int ch1, unsigned int ch2, int n,
-	      std::priority_queue<std::pair<float, int> >& outList);
-void recenter(char* buffer, unsigned int frames,
-			std::vector<std::pair<float, float> > stats);
-float dist(std::vector<float> a, std::vector<float> b);
-std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt);
+float
+dotWithOffset(const std::vector<int16_t>& buffer,
+	      unsigned int ch1, unsigned int ch2,
+	      int offset);
+
+std::vector<std::pair<float, float> >
+xcorr(const std::vector<int16_t>& buffer,
+      unsigned int ch1, unsigned int ch2,
+      int range);
+
+std::pair<float, float>
+delay(const std::vector<int16_t>& buffer,
+      unsigned int ch1, unsigned int ch2,
+      int range);
+
+float
+diffFourway(const std::vector<int16_t>& buffer,
+	    int offset[3]);
+
+void
+findTopNOffsets(const std::vector<int16_t>& buffer,
+		unsigned int ch1, unsigned int ch2, int n,
+		std::priority_queue<std::pair<float, int> >& outList);
+
+void
+recenter(std::vector<int16_t>& buffer,
+	 std::vector<std::pair<float, float> > stats);
+
+float
+dist(std::vector<float> a, std::vector<float> b);
+
+std::vector<float>
+lerp(std::vector<float> a, std::vector<float> b, float amt);

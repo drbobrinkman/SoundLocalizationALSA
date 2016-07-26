@@ -142,8 +142,8 @@ void Server::operator() (http_server::request const &request,
 	  offset = offsets[i-1];
 	}
 	int x = 0;
-	for(int j=2*i; j < buffer.size(); j += 8){
-	  int16_t val = *(int16_t*)(buffer.data() + j);
+	for(int j=i; j < buffer.size(); j += 4){
+	  int16_t val = buffer[j];
 	  response_str += std::to_string(x + 4*offset) + ","
 	    + std::to_string(50 + (val/(4*loudness))*50) + " ";
 	  
@@ -162,8 +162,8 @@ void Server::operator() (http_server::request const &request,
     int corr_y = 300;
     if(buffer.size() > 0){
       for(int i=0; i<colors.size(); i++){
-	auto autocorr = xcorr(buffer.data(), buffer.size()/8,
-			      i, i, 2*MAX_OFFSET);
+	auto autocorr = xcorr(buffer,
+			      i, i, 2*SENSOR_SPACING_SAMPLES);
 	float max = 1.0f;
 	for(int j=0; j < autocorr.size(); j++){
 	  float val = std::abs(autocorr[j].second);
@@ -174,7 +174,7 @@ void Server::operator() (http_server::request const &request,
 	int x = 0;
 	for(int j=0; j < autocorr.size(); j++){
 	  std::pair<float, float> val = autocorr[j];
-	  response_str += std::to_string(corr_x+5*val.first) + ","
+	  response_str += std::to_string(corr_x+3*val.first) + ","
 	    + std::to_string(corr_y-50*(val.second/max)) + " "; //invert y axis
 	}
 	response_str += "\" style=\"fill:none;stroke:";
@@ -198,10 +198,10 @@ void Server::operator() (http_server::request const &request,
     response_str += ";stroke-width:1\" />\n";
 
     if(buffer.size() > 0){
-      for(int ch1=0; ch1<colors.size()-1; ch1++){
-	for(int ch2=ch1+1; ch2 < colors.size(); ch2++){
-	  auto autocorr = xcorr(buffer.data(), buffer.size()/8,
-				ch1, ch2, 2*MAX_OFFSET);
+      for(int ch1=0; ch1<colors.size(); ch1++){
+	for(int ch2=0; ch2 < colors.size(); ch2++){
+	  auto autocorr = xcorr(buffer,
+				ch1, ch2, 2*SENSOR_SPACING_SAMPLES);
 	  float max = 1.0f;
 	  for(int j=0; j < autocorr.size(); j++){
 	    float val = std::abs(autocorr[j].second);
@@ -212,7 +212,7 @@ void Server::operator() (http_server::request const &request,
 	  int x = 0;
 	  for(int j=0; j < autocorr.size(); j++){
 	    std::pair<float, float> val = autocorr[j];
-	    response_str += std::to_string(ch1*200 + corr_x+5*val.first) + ","
+	    response_str += std::to_string(ch1*200 + corr_x+3*val.first) + ","
 	      + std::to_string(ch2*100 + corr_y-50*(val.second/max)) + " ";
 	  }
 	  response_str += "\" style=\"fill:none;stroke:";
@@ -238,29 +238,29 @@ void Server::operator() (http_server::request const &request,
 	  response_str += ";stroke-width:1\" />\n";
 
 	  response_str += "<polyline points=\"";
-	  response_str += std::to_string(ch1*200 + corr_x + SENSOR_SPACING_SAMPLES*5) + ","
+	  response_str += std::to_string(ch1*200 + corr_x + SENSOR_SPACING_SAMPLES*3) + ","
 	    + std::to_string(ch2*100 + corr_y - 50)
-	    + " " + std::to_string(ch1*200 + corr_x + SENSOR_SPACING_SAMPLES*5) + ","
+	    + " " + std::to_string(ch1*200 + corr_x + SENSOR_SPACING_SAMPLES*3) + ","
 	    + std::to_string(ch2*100 + corr_y + 50);
 	  response_str += "\" style=\"fill:none;stroke:";
 	  response_str += "gray";
 	  response_str += ";stroke-width:1\" />\n";
 
 	  response_str += "<polyline points=\"";
-	  response_str += std::to_string(ch1*200 + corr_x - SENSOR_SPACING_SAMPLES*5) + ","
+	  response_str += std::to_string(ch1*200 + corr_x - SENSOR_SPACING_SAMPLES*3) + ","
 	    + std::to_string(ch2*100 + corr_y - 50)
-	    + " " + std::to_string(ch1*200 + corr_x - SENSOR_SPACING_SAMPLES*5) + ","
+	    + " " + std::to_string(ch1*200 + corr_x - SENSOR_SPACING_SAMPLES*3) + ","
 	    + std::to_string(ch2*100 + corr_y + 50);
 	  response_str += "\" style=\"fill:none;stroke:";
 	  response_str += "gray";
 	  response_str += ";stroke-width:1\" />\n";
 
 	  
-	  std::pair<float, float> delay_ = delay(buffer.data(),
-						 buffer.size()/8, ch1, ch2,
+	  std::pair<float, float> delay_ = delay(buffer,
+						 ch1, ch2,
 						 MAX_OFFSET);
 	  response_str += "<circle cx=\""
-	    + std::to_string(ch1*200 + corr_x + delay_.first*5) +
+	    + std::to_string(ch1*200 + corr_x + delay_.first*3) +
 	    "\" cy=\"" + std::to_string(ch2*100 + corr_y)
 	    + "\" fill=\"green\" r=\"2\"/>\n";
 	  
@@ -331,7 +331,7 @@ Server::Server(Tracker& itrk) :
 Server::~Server(){
 }
 
-void Server::putBuffer(std::vector<char> const &ibuffer, float iloudness,
+void Server::putBuffer(std::vector<int16_t> &ibuffer, float iloudness,
 		       std::vector<float> ioffsets,
 			//std::vector<Trackable> isounds,
 		       unsigned long iframeNum){
