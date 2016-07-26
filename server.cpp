@@ -29,6 +29,7 @@
  *  this is the best design.
  **/
 
+#include <thread>
 #include <mutex>
 #include <fstream>
 #include <streambuf>
@@ -313,19 +314,21 @@ void Server::log(http_server::string_type const &info) {
 }
 
 void Server::run(){
-  server_.run();
+  if(p_server){
+    p_server->run();
+  } else {
+    throw std::string("Tried to run server without server instance");
+  }
 }
 
-//TODO: There is some race condition here ... segfaults sometimes,
-// not others
-Server::Server(Tracker& itrk) :
-  options(*this),
-  server_(options.address("0.0.0.0").port("8000")),
-  trck(itrk),
-  t(&Server::run, this)
+Server::Server(Tracker& itrk) : trck(itrk)
 {
-  std::cout << "About to detach" << std::endl;
-  t.detach();
+  static http_server::options options_(*this);
+  static http_server server_(options_.address("0.0.0.0").port("8000"));
+  p_server = &server_;
+
+  static std::thread t_(&Server::run, this);
+  t_.detach();
 }
 
 Server::~Server(){

@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <thread>
 #include <vector>
 #include <cstdint>
 
@@ -46,7 +45,6 @@ class Server {
   Server(Tracker& itrck);
   ~Server();
 
-  std::thread t;
   Tracker& trck;
   
   bool running=true;
@@ -70,8 +68,7 @@ class Server {
   unsigned long frameNumber;
   unsigned long frameNumberLastSentData = -1;
   
-  http_server::options options;
-  http_server server_;
+  http_server* p_server = nullptr;
   
  public:
   void run();
