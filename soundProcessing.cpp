@@ -21,7 +21,6 @@
 
 #include "soundProcessing.h"
 #include "constants.h"
-#include "microphone.h"
 #include <cmath>
 #include <cstdint>
 #include <algorithm>

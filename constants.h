@@ -41,7 +41,12 @@ constexpr float METERS_PER_INCH = 0.0254f;
     \bug Should get this from the Microphone class, instead of hard coding it
 */
 //Used here and locationlut.cpp
-constexpr int SAMPLES_PER_SECOND = 16000;
+constexpr unsigned int SAMPLES_PER_SECOND = 16000;
+
+/*! Number of channels coming from microphone 
+    \bug Should get this from the Microphone class, instead of hard coding it
+*/
+constexpr unsigned int NUM_CHANNELS = 4;
 
 /*! Speed of sound in seconds per meter*/
 //Used here and locationlut.cpp

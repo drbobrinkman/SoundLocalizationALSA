@@ -34,8 +34,6 @@
 #include <vector>
 #include <cstdint>
 
-constexpr int NUM_CHANNELS = 4;
-
 class Microphone {
  public:
   static Microphone& getInstance(){
@@ -58,6 +56,9 @@ class Microphone {
   snd_pcm_t *handle;
   snd_pcm_hw_params_t *params;
   snd_pcm_uframes_t frames;
+
+  unsigned int channels;
+  unsigned int rate;
   
   std::vector<int16_t> buffer;
   //Note: Buffer size should be frames*8, because we are using

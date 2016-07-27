@@ -34,6 +34,9 @@ Microphone::Microphone() {
   unsigned int val, val2;
   int dir;
 
+  channels = NUM_CHANNELS;
+  rate = SAMPLES_PER_SECOND;
+  
   /* Open PCM device for playback. */
   rc = snd_pcm_open(&handle, "hw:1,0",
 		    SND_PCM_STREAM_CAPTURE, 0);
@@ -58,13 +61,12 @@ Microphone::Microphone() {
   snd_pcm_hw_params_set_format(handle, params,
 			       SND_PCM_FORMAT_S16_LE);
 
-  snd_pcm_hw_params_set_channels(handle, params, 4);
+  snd_pcm_hw_params_set_channels(handle, params, channels);
 
-  val = 16000;
   snd_pcm_hw_params_set_rate_near(handle,
-				  params, &val, &dir);
+				  params, &rate, &dir);
 
-  frames = (int)(0.5 + (double)val/TARGET_FRAME_RATE);
+  frames = (int)(0.5 + (double)rate/TARGET_FRAME_RATE);
   snd_pcm_hw_params_set_period_size_near(handle, params,
 					 &frames, &dir);
   /* Write the parameters to the driver */
@@ -77,7 +79,7 @@ Microphone::Microphone() {
   /*Get frame size after init */
   snd_pcm_hw_params_get_period_size(params,
 				    &frames, &dir);
-  int size = frames*NUM_CHANNELS;
+  int size = frames*channels;
   buffer.resize(size, 0);
 }
 

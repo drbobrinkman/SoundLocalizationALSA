@@ -57,8 +57,8 @@ constexpr char FNAME[] = "lut.csv";
 std::vector<float> offsetsForLocation(float x, float y, float z){
   std::vector<float> pt = {x, y, z};
 
-  float micDists[NUM_CHANNELS];
-  for(int i=0; i < NUM_CHANNELS; i++){
+  float micDists[MIC_LOCATIONS.size()];
+  for(int i=0; i < MIC_LOCATIONS.size(); i++){
     micDists[i] = dist(pt, MIC_LOCATIONS[i]);
   }
   
