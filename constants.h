@@ -1,4 +1,11 @@
-/**
+/** \file constants.h
+ * Collection of constants that are used in multiple cpp files
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-27
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -21,27 +28,41 @@
 
 #pragma once
 
+/*! Real world distance between micropohes, which should be arranged
+ *  in a tetrahedron */
+//Used here and locationlut.cpp
 constexpr float SENSOR_SPACING_INCHES = 7.0f;
+
+/*! Conversion rate from inches to meters */
+//Used here and locationlut.cpp
+constexpr float METERS_PER_INCH = 0.0254f;
+
+/*! Sample rate of the microphone we use 
+    \bug Should get this from the Microphone class, instead of hard coding it
+*/
+//Used here and locationlut.cpp
 constexpr int SAMPLES_PER_SECOND = 16000;
 
+/*! Speed of sound in seconds per meter*/
+//Used here and locationlut.cpp
 constexpr float SPEED_OF_SOUND_SECONDS_PER_METER = (float)(1.0/340.29);
-constexpr float METERS_PER_INCH = 0.0254f;
-constexpr float SENSOR_SPACING_METERS = SENSOR_SPACING_INCHES*METERS_PER_INCH;
+
+/*! Speed of sound in seconds per inch */
+//Used only here
 constexpr float SPEED_OF_SOUND_SECONDS_PER_INCH = METERS_PER_INCH *
   SPEED_OF_SOUND_SECONDS_PER_METER;
 
+/*! Sensor spacing in terms of how many microphone samples elapse as
+ *  sound travels from one microphone to another */
+//Used in main.cpp and server.cpp
 constexpr float SENSOR_SPACING_SAMPLES = SENSOR_SPACING_INCHES *
   SAMPLES_PER_SECOND * SPEED_OF_SOUND_SECONDS_PER_INCH;
 
-constexpr float SPEED_OF_SOUND_SAMPLES_PER_METER = SAMPLES_PER_SECOND *
-  SPEED_OF_SOUND_SECONDS_PER_METER;
-
-constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
-constexpr int MIN_OFFSET = -MAX_OFFSET;
-
-constexpr float SIN_60 = 0.86602540378f;
-constexpr float TAN_60 = 1.73205080757f;
-
+/*! Signals less loud than this are considered silence. Determine
+ *  empirically based on application */
+//Used in server.cpp and tracker.cpp
 constexpr float SILENCE_LOUDNESS = 250.0f;
 
+/*! Number of times we sample the microphone per second. */
+//Used in tracker.cpp and microphone.cpp
 constexpr float TARGET_FRAME_RATE = 15.0f;

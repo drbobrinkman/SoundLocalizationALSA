@@ -30,11 +30,6 @@ std::vector<std::pair<float, float> >
 meansAndStdDevs(const std::vector<int16_t>& buffer);
 
 float
-diffWithOffset(const std::vector<int16_t>& buffer,
-	       unsigned int ch1, unsigned int ch2,
-	       int offset);
-
-float
 dotWithOffset(const std::vector<int16_t>& buffer,
 	      unsigned int ch1, unsigned int ch2,
 	      int offset);
@@ -48,15 +43,6 @@ std::pair<float, float>
 delay(const std::vector<int16_t>& buffer,
       unsigned int ch1, unsigned int ch2,
       int range);
-
-float
-diffFourway(const std::vector<int16_t>& buffer,
-	    int offset[3]);
-
-void
-findTopNOffsets(const std::vector<int16_t>& buffer,
-		unsigned int ch1, unsigned int ch2, int n,
-		std::priority_queue<std::pair<float, int> >& outList);
 
 void
 recenter(std::vector<int16_t>& buffer,

@@ -34,6 +34,8 @@
 #include "constants.h"
 
 constexpr float LUT_KEY_PREC = 1.0f;
+constexpr int MAX_OFFSET = (int)(SENSOR_SPACING_SAMPLES*1.25);
+constexpr int MIN_OFFSET = -MAX_OFFSET;
 
 class LocationLUT {
  public:

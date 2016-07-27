@@ -259,7 +259,7 @@ void Server::operator() (http_server::request const &request,
 	  
 	  std::pair<float, float> delay_ = delay(buffer,
 						 ch1, ch2,
-						 MAX_OFFSET);
+						 SENSOR_SPACING_SAMPLES*2);
 	  response_str += "<circle cx=\""
 	    + std::to_string(ch1*200 + corr_x + delay_.first*3) +
 	    "\" cy=\"" + std::to_string(ch2*100 + corr_y)

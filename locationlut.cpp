@@ -30,6 +30,17 @@
 #include <vector>
 #include <cmath>
 
+/*! Sensor spacing converted to meters */
+constexpr float SENSOR_SPACING_METERS = SENSOR_SPACING_INCHES*METERS_PER_INCH;
+
+/*! Speed of sound in terms of how many microphone samples elapse as sound
+ * travels one meter */
+constexpr float SPEED_OF_SOUND_SAMPLES_PER_METER = SAMPLES_PER_SECOND *
+  SPEED_OF_SOUND_SECONDS_PER_METER;
+
+constexpr float SIN_60 = 0.86602540378f;
+constexpr float TAN_60 = 1.73205080757f;
+
 //Origin is on the triangle, directly below the "up" mic
 std::vector<std::vector<float> > MIC_LOCATIONS =
   {
