@@ -26,10 +26,10 @@ DEPS = microphone.h soundProcessing.h constants.h locationlut.h spherepoints.h s
 OBJ = main.o microphone.o soundProcessing.o locationlut.o spherepoints.o server.o tracker.o updateServer.o
 
 %.o: %.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
 
 sla: $(OBJ)
-	g++ -o $@ $^ $(CFLAGS) $(PRODFLAGS) $(LIBS)
+	$(CPP) -o $@ $^ $(CFLAGS) $(PRODFLAGS) $(LIBS)
 
 clean:
 	rm -f *.o *~ core
