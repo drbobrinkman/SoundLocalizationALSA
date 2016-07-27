@@ -24,6 +24,8 @@ PRODFLAGS=-O3
 LIBS=-lasound -lpthread -lboost_system -lboost_thread -lcppnetlib-uri -lcppnetlib-server-parsers -lcppnetlib-client-connections
 OBJ = main.o microphone.o soundProcessing.o locationlut.o spherepoints.o server.o tracker.o updateServer.o utils.o
 
+default: sla
+
 main.o: main.cpp microphone.h locationlut.h constants.h server.h \
  tracker.h soundProcessing.h updateServer.h utils.h
 	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
@@ -58,5 +60,3 @@ sla: $(OBJ)
 
 clean:
 	rm -f *.o *~ core
-
-default: sla
