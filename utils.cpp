@@ -1,3 +1,10 @@
+/** \file utils.cpp
+ * Collection of utility functions that are used in multiple cpp files
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-27
+ */
+
 /*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
