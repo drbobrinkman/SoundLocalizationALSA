@@ -1,4 +1,4 @@
-/**
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -19,13 +19,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
-/**
+/*
  * Code for this class is based on http://blog.marmakoide.org/?p=1
  **/
 
 #include "spherepoints.h"
 #include <cmath>
-#include <iostream>
 
 std::vector<std::vector<float> > genPoints(int n){
   std::vector<std::vector<float> > pts;
@@ -74,10 +73,3 @@ float maxMinAngle(std::vector<std::vector<float> >& pts){
 
   return max;
 }
-/*
-int main(){
-  std::vector<std::vector<float> > pts = genPoints(256*256);
-
-  std::cout << "spacing: " << maxMinAngle(pts) << std::endl;
-  return 0;
-  }*/
