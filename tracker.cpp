@@ -1,4 +1,12 @@
-/**
+/** \file tracker.h
+ * Takes in individual detected sounds, and then clusters and tracks them
+ * over time.
+ * 
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-27
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -25,14 +33,30 @@
 
 #include <mutex>
 
+/*! If a point is within this distance of an existing cluster, it should
+ * join that cluster. Note that opposing points have distance 2.0 */
 constexpr float CLUSTER_DISTANCE = 0.5f;
+/*! When adding new points to a cluster we do a weighted average of
+ *  the new location with the old one. This is the amount of weight to
+ *  give to the new point */
 constexpr float SMOOTHING_FACTOR = 1.0f/6.0f;
+/*! If a cluster hasn't been heard in this amount of time, remove from
+ *  the list.*/
 constexpr float TIMEOUT_SECONDS = 1.0f;
-constexpr float FPS = TARGET_FRAME_RATE;
-constexpr float TIMEOUT_FRAMES = TIMEOUT_SECONDS * FPS;
+/*! Timeout in frames instead of seconds, for convenience */
+constexpr float TIMEOUT_FRAMES = TIMEOUT_SECONDS * TARGET_FRAME_RATE;
 
+/*! addPoint and getSoundsSince are called from different threads, so
+ *  we need to guard with a mutex */
 std::mutex g_sounds_mutex;
 
+/*! Linear interpolation between two vectors. The length of the resulting
+ *  vector is the minimum of the lenghts of the input vectors
+ *
+ *  \param amt Amount of vector b to include. For example, 
+ *  1.0 gives just vector b, 0.0
+ *  gives vector a, and 0.5 gives the average of the two vectors.
+ */
 std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt){
   //Keep 1-amt of a, add in amt of b
   std::vector<float> ret;
