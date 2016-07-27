@@ -1,3 +1,12 @@
+/** \file spherepoints.h
+ * Generate n points on a sphere that are close to evenly spaced
+ *
+ * \note Uses the method of http://blog.marmakoide.org/?p=1
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-27
+ */
+
 /*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -19,10 +28,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
-/*
- * Code for this class is based on http://blog.marmakoide.org/?p=1
- **/
 #pragma once
 
 #include <vector>
+
+/*! Create a list of n 3D vectors that are roughly evenly spaced
+ * on a unit sphere. Uses the method of http://blog.marmakoide.org/?p=1 
+ *
+ * \param n number of points desired
+ */
 std::vector<std::vector<float> > genPoints(int n);
