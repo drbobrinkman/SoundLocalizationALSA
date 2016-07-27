@@ -31,6 +31,7 @@
 #include "constants.h"
 #include "tracker.h"
 #include "updateServer.h"
+#include "utils.h"
 
 int main() {
   std::cout << "updating IP Discovery Server" << std::endl;

@@ -22,10 +22,35 @@ CFLAGS=-std=c++14
 DBGFLAGS=-g -O0
 PRODFLAGS=-O3
 LIBS=-lasound -lpthread -lboost_system -lboost_thread -lcppnetlib-uri -lcppnetlib-server-parsers -lcppnetlib-client-connections
-DEPS = microphone.h soundProcessing.h constants.h locationlut.h spherepoints.h server.h tracker.h updateServer.h
-OBJ = main.o microphone.o soundProcessing.o locationlut.o spherepoints.o server.o tracker.o updateServer.o
+OBJ = main.o microphone.o soundProcessing.o locationlut.o spherepoints.o server.o tracker.o updateServer.o utils.o
 
-%.o: %.cpp $(DEPS)
+main.o: main.cpp microphone.h locationlut.h constants.h server.h \
+ tracker.h soundProcessing.h updateServer.h utils.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+microphone.o: microphone.cpp microphone.h constants.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+soundProcessing.o: soundProcessing.cpp soundProcessing.h constants.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+locationlut.o: locationlut.cpp locationlut.h constants.h \
+ spherepoints.h utils.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+spherepoints.o: spherepoints.cpp spherepoints.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+server.o: server.cpp server.h tracker.h constants.h soundProcessing.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+tracker.o: tracker.cpp tracker.h constants.h utils.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+updateServer.o: updateServer.cpp updateServer.h
+	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
+
+utils.o: utils.cpp utils.h
 	$(CPP) -c -o $@ $< $(CFLAGS) $(PRODFLAGS)
 
 sla: $(OBJ)

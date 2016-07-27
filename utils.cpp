@@ -19,31 +19,14 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
-#pragma once
+#include "utils.h"
+#include <cmath>
 
-#include <queue>
-#include <utility>
-#include <vector>
-#include <cstdint>
+float dist(std::vector<float> a, std::vector<float> b){
+  float total = 0.0f;
+  for(int i=0; i < 3; i++){
+    total += (a[i] - b[i])*(a[i] - b[i]);
+  }
 
-std::vector<std::pair<float, float> >
-meansAndStdDevs(const std::vector<int16_t>& buffer);
-
-float
-dotWithOffset(const std::vector<int16_t>& buffer,
-	      unsigned int ch1, unsigned int ch2,
-	      int offset);
-
-std::vector<std::pair<float, float> >
-xcorr(const std::vector<int16_t>& buffer,
-      unsigned int ch1, unsigned int ch2,
-      int range);
-
-std::pair<float, float>
-delay(const std::vector<int16_t>& buffer,
-      unsigned int ch1, unsigned int ch2,
-      int range);
-
-void
-recenter(std::vector<int16_t>& buffer,
-	 std::vector<std::pair<float, float> > stats);
+  return std::sqrt(total);
+}

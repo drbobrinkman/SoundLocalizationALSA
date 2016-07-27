@@ -20,8 +20,8 @@
  **/
 
 #include "tracker.h"
-#include "soundProcessing.h"
 #include "constants.h"
+#include "utils.h"
 
 #include <mutex>
 
@@ -32,6 +32,16 @@ constexpr float FPS = TARGET_FRAME_RATE;
 constexpr float TIMEOUT_FRAMES = TIMEOUT_SECONDS * FPS;
 
 std::mutex g_sounds_mutex;
+
+std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt){
+  //Keep 1-amt of a, add in amt of b
+  std::vector<float> ret;
+  for(int i=0; i < a.size() && i < b.size(); i++){
+    ret.push_back((1.0f-amt)*a[i] + amt*b[i]);
+  }
+
+  return ret;
+}
 
 Tracker::Tracker(){
 }

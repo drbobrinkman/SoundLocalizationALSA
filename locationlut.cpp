@@ -20,9 +20,8 @@
  **/
 
 #include "locationlut.h"
-#include "microphone.h"
 #include "spherepoints.h"
-#include "soundProcessing.h"
+#include "utils.h"
 
 #include <iostream>
 #include <iomanip>

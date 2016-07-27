@@ -21,29 +21,7 @@
 
 #pragma once
 
-#include <queue>
-#include <utility>
 #include <vector>
-#include <cstdint>
-
-std::vector<std::pair<float, float> >
-meansAndStdDevs(const std::vector<int16_t>& buffer);
 
 float
-dotWithOffset(const std::vector<int16_t>& buffer,
-	      unsigned int ch1, unsigned int ch2,
-	      int offset);
-
-std::vector<std::pair<float, float> >
-xcorr(const std::vector<int16_t>& buffer,
-      unsigned int ch1, unsigned int ch2,
-      int range);
-
-std::pair<float, float>
-delay(const std::vector<int16_t>& buffer,
-      unsigned int ch1, unsigned int ch2,
-      int range);
-
-void
-recenter(std::vector<int16_t>& buffer,
-	 std::vector<std::pair<float, float> > stats);
+dist(std::vector<float> a, std::vector<float> b);
