@@ -1,4 +1,18 @@
-/**
+/** \file updateServer.cpp
+ * This is a kludgey solution to service discovery. 
+ * 
+ * \bug Uses shelvar.com to 
+ * store the IP address of the server, so that it can be looked up by the
+ * client. If the client were a Mac we could use hostname.local, but haven't
+ * found a quick and easy solution for Windows 10 devices. This could be
+ * exploited.
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-27
+ */
+
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
