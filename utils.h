@@ -1,4 +1,11 @@
-/**
+/** \file utils.h
+ * Collection of utility functions that are used in multiple cpp files
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-27
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -23,5 +30,9 @@
 
 #include <vector>
 
+/*!
+ * Compute the Euclidean distance between two three dimensional
+ * vectors. If either vector is length other than three, behavior is
+ * undefined */
 float
 dist(std::vector<float> a, std::vector<float> b);
