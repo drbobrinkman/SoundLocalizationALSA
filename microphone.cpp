@@ -1,4 +1,16 @@
-/**
+/** \file microphone.h
+ * Manages setup and teardown of the microphone, via ALSA.
+ * 
+ * \note Portions of this code come from 
+ * http://www.linuxjournal.com/node/6735/print
+ * Tranter, Jeff. "Introduction to Sound Programming with ALSA." Linux Journal,
+ * Sep 30, 2004.
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-28
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -18,13 +30,6 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
-
-/**
- * Portions of this code come from http://www.linuxjournal.com/node/6735/print
- * Tranter, Jeff. "Introduction to Sound Programming with ALSA." Linux Journal,
- *  Sep 30, 2004.
- **/
-#include <iostream>
 
 #include "microphone.h"
 #include "constants.h"

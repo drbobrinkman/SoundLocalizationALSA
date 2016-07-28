@@ -1,4 +1,16 @@
-/**
+/** \file microphone.h
+ * Manages setup and teardown of the microphone, via ALSA.
+ * 
+ * \note Portions of this code come from 
+ * http://www.linuxjournal.com/node/6735/print
+ * Tranter, Jeff. "Introduction to Sound Programming with ALSA." Linux Journal,
+ * Sep 30, 2004.
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-28
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -19,48 +31,53 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
-/**
- * Portions of this code come from http://www.linuxjournal.com/node/6735/print
- * Tranter, Jeff. "Introduction to Sound Programming with ALSA." Linux Journal,
- *  Sep 30, 2004.
- **/
-
 #pragma once
 
-/* Use the newer ALSA API */
+/*! Use the newer ALSA API */
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 
 #include <vector>
 #include <cstdint>
 
+/*! Class to manage an ALSA microphone 
+ *
+ * \note Singleton, with lazy initialization. (Meyers style singleton) 
+ *
+ * \bug We are not doing any encapsulation here, all of the variables
+ * are public. The main purpose of this class is to provide resource
+ * acquisition and cleanup.
+ */
 class Microphone {
  public:
+  /*! Return the singleton instance. */
   static Microphone& getInstance(){
     static Microphone instance;
     return instance;
   }
   
  private:
-  //This is to make sure we don't try to make Microphones using new and
-  // delete
+  //ctor and dtor are private to encourage correct usage of singleton
   Microphone();
   ~Microphone();
 
  public:
-  //This is to make sure we don't forget to declare our variables
-  // as references
+  /*! Copy ctor deleted so that we don't accidentally make a copy */
   Microphone(Microphone const&) = delete;
+  /*! Copy assignment deleted so that we don't accidentally make a copy */
   void operator=(Microphone const&) = delete;
-  
-  snd_pcm_t *handle;
-  snd_pcm_hw_params_t *params;
-  snd_pcm_uframes_t frames;
 
+  /*! ALSA handle for the microphone */
+  snd_pcm_t *handle;
+  /*! ALSA object for hw parameters */
+  snd_pcm_hw_params_t *params;
+  /*! Number of frames we want per call to snd_pcm_readi */
+  snd_pcm_uframes_t frames;
+  /*! Number of channels in the signal */
   unsigned int channels;
+  /*! Rate of the signal, in samples per second */
   unsigned int rate;
-  
+
+  /*! Buffer for storing the most recently read sound clip */
   std::vector<int16_t> buffer;
-  //Note: Buffer size should be frames*8, because we are using
-  // 16-bit format with 4 channels
 };
