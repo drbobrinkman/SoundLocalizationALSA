@@ -1,0 +1,10 @@
+\form#0:$\frac{1}{n-offset}\sum_{i=0}^{n-offset} x_iy_{i+offset}$
+\form#1:$\frac{1}{n-offset}\sum_{i=0}^{n-offset} x_{i+offset}y_{i}$
+\form#2:$x_i$
+\form#3:$y_i$
+\form#4:$n$
+\form#5:$o$
+\form#6:$\frac{1}{n-o}\sum_{i=0}^{n-o} x_iy_{i+o}$
+\form#7:$\frac{1}{n-o}\sum_{i=0}^{n-o} x_{i+o}y_{i}$
+\form#8:$\frac{1}{n-o}\sum_{i=0}^{n-o-1} x_iy_{i+o}$
+\form#9:$\frac{1}{n-o}\sum_{i=0}^{n-o-1} x_{i+o}y_{i}$
