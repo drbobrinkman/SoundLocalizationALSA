@@ -33,6 +33,7 @@
 
 #include "microphone.h"
 #include "constants.h"
+#include <string>
 
 Microphone::Microphone() {
   int rc;
