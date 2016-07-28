@@ -33,10 +33,10 @@
 
 std::vector<std::pair<float, float> >
 meansAndStdDevs(const std::vector<int16_t>& buffer){
-  float total[NUM_CHANNELS] = {0.0f, 0.0f, 0.0f, 0.0f};
-  float totalSq[NUM_CHANNELS] = {0.0f, 0.0f, 0.0f, 0.0f};
+  std::vector<float> total(NUM_CHANNELS, 0.0f);
+  std::vector<float> totalSq(NUM_CHANNELS, 0.0f);
 
-  unsigned int count[NUM_CHANNELS] = {0, 0, 0, 0};
+  std::vector<unsigned int> count(NUM_CHANNELS, 0);
   //This assumes that the input format is S16_LE
 
   int channel = 0;
@@ -91,9 +91,8 @@ xcorr(const std::vector<int16_t>& buffer,
   std::vector<std::pair<float, float> > ret;
   
   for(int offset=-range; offset <= range; offset++){
-    ret.push_back(std::make_pair(offset,
-				 dotWithOffset(buffer, ch1, ch2,
-						offset)));
+    ret.push_back(std::make_pair(offset, dotWithOffset(buffer, ch1, ch2,
+						       offset)));
   }
 
   return ret;
@@ -102,13 +101,11 @@ xcorr(const std::vector<int16_t>& buffer,
 std::pair<float, float> delay(const std::vector<int16_t>& buffer,
 			      unsigned int ch1, unsigned int ch2,
 			      int range){
-  std::vector<std::pair<float, float> > corrs = xcorr(buffer,
-						      ch1, ch2, range+2);
+  std::vector<std::pair<float, float> > corrs
+    = xcorr(buffer, ch1, ch2, range+2); //TODO: Should this +2 be gone now?
 
-  float ac1 = dotWithOffset(buffer,
-			    ch1, ch1, 0);
-  float ac2 = dotWithOffset(buffer, 
-			    ch2, ch2, 0);
+  float ac1 = dotWithOffset(buffer, ch1, ch1, 0);
+  float ac2 = dotWithOffset(buffer, ch2, ch2, 0);
   
   int maxOffset = 0;
   std::pair<float, float> maxVal = corrs[0];
@@ -124,14 +121,12 @@ std::pair<float, float> delay(const std::vector<int16_t>& buffer,
     }
   }
 
-  return std::make_pair(maxVal.first,
-			maxVal.second/
-			std::sqrt(ac1*ac2));
+  return std::make_pair(maxVal.first, maxVal.second/std::sqrt(ac1*ac2));
 }
 
 void recenter(std::vector<int16_t>& buffer, 
 	      std::vector<std::pair<float, float> > stats){
-  float scale[NUM_CHANNELS] = {1.0f, 1.0f, 1.0f, 1.0f};
+  std::vector<float> scale(NUM_CHANNELS, 1.0f);
   float amax = stats[0].second;
   for(int i=1; i<NUM_CHANNELS; i++){
     amax = std::max(amax, stats[i].second); 
@@ -152,7 +147,7 @@ void recenter(std::vector<int16_t>& buffer,
       int offset = i*NUM_CHANNELS + j;
       float val = (float)buffer[offset];
       val = val - stats[j].first;
-      //val = val*scale[j];
+      //val = val*scale[j]; //Only needed if we also want to rescale
       buffer[offset] = (int16_t)(val+0.5);
     }
   }
