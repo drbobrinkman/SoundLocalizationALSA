@@ -77,13 +77,9 @@ constexpr char FNAME[] = "lut.csv";
 /*! Given a location in world coordinates, calculate the microphone
  *  delay offsets for mics 1, 2, and 3.
  *
- * \param x x coordinate of the point, in meters
- * \param y y coordinate of the point, in meters
- * \param z z coordinate of the point, in meters
+ * \param pt coordinates of the point, in meters
  */
-std::vector<float> offsetsForLocation(float x, float y, float z){
-  std::vector<float> pt = {x, y, z};
-
+std::vector<float> offsetsForLocation(std::vector<float> pt){
   float micDists[MIC_LOCATIONS.size()];
   for(int i=0; i < MIC_LOCATIONS.size(); i++){
     micDists[i] = dist(pt, MIC_LOCATIONS[i]);
@@ -121,8 +117,7 @@ void LocationLUT::buildLUT(){
     //Don't worry about noises right next to the person
     if(dist(center, pt) < 0.05) continue;
 	
-    std::vector<float> offsets
-      = offsetsForLocation(pt[0], pt[1], pt[2]);
+    std::vector<float> offsets = offsetsForLocation(pt);
     
     if(found_points.count(offsets) == 0){
       std::vector<std::vector<float>> t;
