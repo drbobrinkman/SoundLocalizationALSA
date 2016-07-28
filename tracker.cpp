@@ -56,6 +56,8 @@ std::mutex g_sounds_mutex;
  *  \param amt Amount of vector b to include. For example, 
  *  1.0 gives just vector b, 0.0
  *  gives vector a, and 0.5 gives the average of the two vectors.
+ *  \param a The first vector, expected to have length 3
+ *  \param b The second vector, expected to have length 3
  */
 std::vector<float> lerp(std::vector<float> a, std::vector<float> b, float amt){
   //Keep 1-amt of a, add in amt of b
