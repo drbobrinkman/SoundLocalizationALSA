@@ -1,4 +1,19 @@
-/**
+/** \file locationlut.cpp
+ * Data structure for mapping sounds delays to directions.
+ *
+ * We have 4 microphones, and we can calculate the signal delay
+ * between microphone 0 and each of the other three. This gives us a 3D
+ * vector that tells us something about the location of the sound relative
+ * to the four microphones, but not in a form that is usable. What we really
+ * want is a unit vector that points in the correct direction from the center
+ * of the mic array. This data structure makes it easy to look up the direction
+ * given the array of delays.
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-28
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -37,10 +52,17 @@ constexpr float SENSOR_SPACING_METERS = SENSOR_SPACING_INCHES*METERS_PER_INCH;
 constexpr float SPEED_OF_SOUND_SAMPLES_PER_METER = SAMPLES_PER_SECOND *
   SPEED_OF_SOUND_SECONDS_PER_METER;
 
+/*! sin of 60 degrees */
 constexpr float SIN_60 = 0.86602540378f;
+/*! tan of 60 degrees */
 constexpr float TAN_60 = 1.73205080757f;
 
-//Origin is on the triangle, directly below the "up" mic
+/*! Locations of the 4 microphones relative to the origin, in meters.
+ *
+ * Microphones form a tetrahedron, with three mics in a plane parallel
+ * to the ground, and one mic above them. The origin is in the plane parallel
+ * to the ground, directly under the "up" mic.
+ */
 std::vector<std::vector<float> > MIC_LOCATIONS =
   {
     {0.0f, SENSOR_SPACING_METERS/(2*SIN_60), 0.0f}, //Front
@@ -49,10 +71,16 @@ std::vector<std::vector<float> > MIC_LOCATIONS =
     {0.0f, 0.0f, SENSOR_SPACING_METERS}  //Up
   };
 
-constexpr float RANGE = 10.0f;
-constexpr float PRECISION = 0.1f;
+/*! Name of file for caching the lookup table */
 constexpr char FNAME[] = "lut.csv";
 
+/*! Given a location in world coordinates, calculate the microphone
+ *  delay offsets for mics 1, 2, and 3.
+ *
+ * \param x x coordinate of the point, in meters
+ * \param y y coordinate of the point, in meters
+ * \param z z coordinate of the point, in meters
+ */
 std::vector<float> offsetsForLocation(float x, float y, float z){
   std::vector<float> pt = {x, y, z};
 
