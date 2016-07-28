@@ -46,6 +46,14 @@ namespace http = boost::network::http;
 
 #include "updateServer.h"
 
+/*! Executes another program, returning whatever it prints as a string.
+ * \param cmd a command to be run
+ * \return Whatever the command prints to standard output (stderr is not 
+ * included)
+ *
+ * \note Code from http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c-using-posix
+ *
+ */
 std::string exec(const char* cmd) {
   char buffer[128];
   std::string result = "";
