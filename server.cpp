@@ -1,4 +1,14 @@
-/**
+/** \file server.cpp
+ * A very simple web server to expose the getSoundsSince method of Tracker
+ * as a json file.
+ *
+ * Also provides some debug views of the data
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-28
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -36,6 +46,8 @@
 
 using namespace boost::network;
 
+/*! Mutex for protecting the variables that get set by putBuffer but
+ *  used by the callback functions */
 std::mutex g_buffer_mutex;
 
 void Server::operator() (http_server::request const &request,
@@ -280,18 +292,6 @@ void Server::operator() (http_server::request const &request,
     std::vector<Trackable> sounds
       = trck.getSoundsSince(frameNumberLastSentData);
 
-    /*    for(int i=0; i < sounds.size(); i++){
-      if(sounds[i].loudness < SILENCE_LOUDNESS) continue;
-      
-      response_str += "<circle cx=\"";
-      response_str += std::to_string(200 + sounds[i].location[0]*50);
-      response_str += "\" cy=\"";
-      response_str += std::to_string(200 - sounds[i].location[1]*50);
-      response_str += "\" r=\"";
-      response_str += std::to_string(sounds[i].loudness/200);
-      response_str += "\" fill=\"blue\"/>\n";
-      }*/
-    
     response_str += "</svg>\n";
     
     response = http_server::response::stock_reply
@@ -340,13 +340,11 @@ Server::~Server(){
 
 void Server::putBuffer(std::vector<int16_t> &ibuffer, float iloudness,
 		       std::vector<float> ioffsets,
-			//std::vector<Trackable> isounds,
 		       unsigned long iframeNum){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;
   buffer = ibuffer;
   loudness = iloudness;
-  //sounds = isounds;
   frameNumber = iframeNum;
 }
