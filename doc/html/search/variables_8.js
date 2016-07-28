@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['onload',['onload',['../tracker_8js.html#a43397fd3516cd230995b3edbbadff48b',1,'tracker.js']]]
+  ['num_5fchannels',['NUM_CHANNELS',['../constants_8h.html#ab1271d274be194223c4b660de4aaaeac',1,'constants.h']]]
 ];

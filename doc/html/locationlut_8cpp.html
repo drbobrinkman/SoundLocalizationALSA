@@ -106,8 +106,8 @@ Include dependency graph for locationlut.cpp:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa4bdbb1990b2bf6c6d1639d67ddf665e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="locationlut_8cpp.html#aa4bdbb1990b2bf6c6d1639d67ddf665e">offsetsForLocation</a> (float x, float y, float z)</td></tr>
-<tr class="separator:aa4bdbb1990b2bf6c6d1639d67ddf665e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10eee00d800c82c823371b1d705eaece"><td class="memItemLeft" align="right" valign="top">std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="locationlut_8cpp.html#a10eee00d800c82c823371b1d705eaece">offsetsForLocation</a> (std::vector&lt; float &gt; pt)</td></tr>
+<tr class="separator:a10eee00d800c82c823371b1d705eaece"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -130,41 +130,23 @@ Variables</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>Bo Brinkman <a href="#" onclick="location.href='mai'+'lto:'+'dr.'+'bo'+'.br'+'in'+'kma'+'n@'+'gma'+'il'+'.co'+'m'; return false;">dr.bo<span style="display: none;">.nosp@m.</span>.bri<span style="display: none;">.nosp@m.</span>nkman<span style="display: none;">.nosp@m.</span>@gma<span style="display: none;">.nosp@m.</span>il.co<span style="display: none;">.nosp@m.</span>m</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>2016-07-28 </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="aa4bdbb1990b2bf6c6d1639d67ddf665e"></a>
+<a class="anchor" id="a10eee00d800c82c823371b1d705eaece"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;float&gt; offsetsForLocation </td>
           <td>(</td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">std::vector&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>pt</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>z</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Given a location in world coordinates, calculate the microphone delay offsets for mics 1, 2, and 3.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">x</td><td>x coordinate of the point, in meters </td></tr>
-    <tr><td class="paramname">y</td><td>y coordinate of the point, in meters </td></tr>
-    <tr><td class="paramname">z</td><td>z coordinate of the point, in meters </td></tr>
+    <tr><td class="paramname">pt</td><td>coordinates of the point, in meters </td></tr>
   </table>
   </dd>
 </dl>
@@ -268,7 +250,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 28 2016 15:36:30 for SoundLocalizationALSA by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 28 2016 16:11:26 for SoundLocalizationALSA by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

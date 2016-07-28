@@ -87,16 +87,16 @@ class Server {
    * \param iloudness the standard deviation of the loudest channel
    * \param loc The delays for channels 1, 2, and 3 vs. channel 0. Used
    *        for drawing the 4 channels correctly aligned
-   * \param iframeNum The frame number for the frame of data being provided
-   *
-   * \bug Right now this method MUST be called once for each frame of audio,
-   *      because we need the frameNumber when serving sounds.json. Should
-   *      decouple the debug functionality from the necessary functionality
-   *      TODO 
    */
   void putBuffer(std::vector<int16_t> &ibuffer, float iloudness,
-		 std::vector<float> loc,
-		 unsigned long iframeNum);
+		 std::vector<float> loc);
+
+  /*! Notify the server of which frame number the microphone has just
+   *  delivered. Should be called once for each time snd_pcm_readi is
+   *  called on the microphone 
+   *
+   * \param iframeNum which frame number the main loop is currently on */
+  void tickTo(unsigned long iframeNum);
 
  private:
   std::vector<int16_t> buffer;

@@ -155,7 +155,7 @@ void Server::operator() (http_server::request const &request,
 	  offset = offsets[i-1];
 	}
 	int x = 0;
-	for(int j=i; j < buffer.size(); j += 4){
+	for(int j=i; j < buffer.size(); j += NUM_CHANNELS){
 	  int16_t val = buffer[j];
 	  response_str += std::to_string(x + 4*offset) + ","
 	    + std::to_string(50 + (val/(4*loudness))*50) + " ";
@@ -339,12 +339,15 @@ Server::~Server(){
 }
 
 void Server::putBuffer(std::vector<int16_t> &ibuffer, float iloudness,
-		       std::vector<float> ioffsets,
-		       unsigned long iframeNum){
+		       std::vector<float> ioffsets){
   std::lock_guard<std::mutex> guard(g_buffer_mutex);
 
   offsets = ioffsets;
   buffer = ibuffer;
   loudness = iloudness;
+}
+
+void Server::tickTo(unsigned long iframeNum){
+  std::lock_guard<std::mutex> guard(g_buffer_mutex);
   frameNumber = iframeNum;
 }

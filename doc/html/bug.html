@@ -80,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_bug000006"></a>Member <a class="el" href="tracker_8js.html#aa4b20d1ccb4713cd1de75d236b5e9211">frames</a>  </dt>
+<dt><a class="anchor" id="_bug000005"></a>Member <a class="el" href="tracker_8js.html#aa4b20d1ccb4713cd1de75d236b5e9211">frames</a>  </dt>
 <dd>Currently not handling possibility of overflow  </dd>
 <dt><a class="anchor" id="_bug000003"></a>Class <a class="el" href="class_microphone.html">Microphone</a>  </dt>
 <dd>We are not doing any encapsulation here, all of the variables are public. The main purpose of this class is to provide resource acquisition and cleanup.  </dd>
@@ -88,19 +88,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <dd>Should get this from the <a class="el" href="class_microphone.html">Microphone</a> class, instead of hard coding it  </dd>
 <dt><a class="anchor" id="_bug000001"></a>Member <a class="el" href="constants_8h.html#a12a9d041042ecdb7c0ea6592ca77b75b">SAMPLES_PER_SECOND</a>  </dt>
 <dd>Should get this from the <a class="el" href="class_microphone.html">Microphone</a> class, instead of hard coding it  </dd>
-<dt><a class="anchor" id="_bug000004"></a>Member <a class="el" href="class_server.html#a80ae65c21cae8825a22357a336241388">Server::putBuffer</a>  (std::vector&lt; int16_t &gt; &amp;ibuffer, float iloudness, std::vector&lt; float &gt; loc, unsigned long iframeNum)</dt>
-<dd>Right now this method MUST be called once for each frame of audio, because we need the frameNumber when serving sounds.json. Should decouple the debug functionality from the necessary functionality TODO  </dd>
-<dt><a class="anchor" id="_bug000005"></a>Class <a class="el" href="class_tracker.html">Tracker</a>  </dt>
+<dt><a class="anchor" id="_bug000004"></a>Class <a class="el" href="class_tracker.html">Tracker</a>  </dt>
 <dd>We do not gracefully handle wrap-around or overflow of the frame numbers. Overflow should take 9 billion years, so we <em>ought</em> to be okay.  </dd>
-<dt><a class="anchor" id="_bug000007"></a>File <a class="el" href="update_server_8cpp.html">updateServer.cpp</a>  </dt>
+<dt><a class="anchor" id="_bug000006"></a>File <a class="el" href="update_server_8cpp.html">updateServer.cpp</a>  </dt>
 <dd>Uses shelvar.com to store the IP address of the server, so that it can be looked up by the client. If the client were a Mac we could use hostname.local, but haven't found a quick and easy solution for Windows 10 devices. This could be exploited. </dd>
-<dt><a class="anchor" id="_bug000008"></a>File <a class="el" href="update_server_8h.html">updateServer.h</a>  </dt>
+<dt><a class="anchor" id="_bug000007"></a>File <a class="el" href="update_server_8h.html">updateServer.h</a>  </dt>
 <dd>Uses shelvar.com to store the IP address of the server, so that it can be looked up by the client. If the client were a Mac we could use hostname.local, but haven't found a quick and easy solution for Windows 10 devices. This could be exploited.</dd>
 </dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 28 2016 15:36:30 for SoundLocalizationALSA by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 28 2016 16:11:26 for SoundLocalizationALSA by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

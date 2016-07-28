@@ -110,8 +110,9 @@ int main() {
       t.addPoint(cur_pt, loudness, frameNumber);    
     }
 
-    s.putBuffer(m.buffer, loudness, loc, frameNumber);
-    
+    s.putBuffer(m.buffer, loudness, loc);
+    s.tickTo(frameNumber);
+      
     frameNumber++;
     last_pt = cur_pt;
   }

@@ -142,9 +142,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_server.html#a91125777f770683042d4d79e73c61cc7">isRunning</a>();</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_server.html#a80ae65c21cae8825a22357a336241388">putBuffer</a>(std::vector&lt;int16_t&gt; &amp;ibuffer, <span class="keywordtype">float</span> iloudness,</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;         std::vector&lt;float&gt; loc,</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;         <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> iframeNum);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_server.html#a88407e505af9ae9e2c854939eb7211ae">putBuffer</a>(std::vector&lt;int16_t&gt; &amp;ibuffer, <span class="keywordtype">float</span> iloudness,</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;         std::vector&lt;float&gt; loc);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_server.html#a56a3ebf32f30efb2ea0cb7e30e390fb0">tickTo</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> iframeNum);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; <span class="keyword">private</span>:</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  std::vector&lt;int16_t&gt; buffer;</div>
@@ -166,18 +167,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_server_html"><div class="ttname"><a href="class_server.html">Server</a></div><div class="ttdef"><b>Definition:</b> server.h:51</div></div>
 <div class="ttc" id="class_server_html_abb27d30b40a94326e3fd629d3b30b7d5"><div class="ttname"><a href="class_server.html#abb27d30b40a94326e3fd629d3b30b7d5">Server::run</a></div><div class="ttdeci">void run()</div><div class="ttdef"><b>Definition:</b> server.cpp:316</div></div>
 <div class="ttc" id="class_server_html_a91125777f770683042d4d79e73c61cc7"><div class="ttname"><a href="class_server.html#a91125777f770683042d4d79e73c61cc7">Server::isRunning</a></div><div class="ttdeci">bool isRunning()</div><div class="ttdef"><b>Definition:</b> server.cpp:307</div></div>
+<div class="ttc" id="class_server_html_a56a3ebf32f30efb2ea0cb7e30e390fb0"><div class="ttname"><a href="class_server.html#a56a3ebf32f30efb2ea0cb7e30e390fb0">Server::tickTo</a></div><div class="ttdeci">void tickTo(unsigned long iframeNum)</div><div class="ttdef"><b>Definition:</b> server.cpp:350</div></div>
 <div class="ttc" id="class_server_html_a5371642ecd0f2755e1796a545585727e"><div class="ttname"><a href="class_server.html#a5371642ecd0f2755e1796a545585727e">Server::log</a></div><div class="ttdeci">void log(http_server::string_type const &amp;info)</div><div class="ttdef"><b>Definition:</b> server.cpp:312</div></div>
 <div class="ttc" id="tracker_8h_html"><div class="ttname"><a href="tracker_8h.html">tracker.h</a></div></div>
+<div class="ttc" id="class_server_html_a88407e505af9ae9e2c854939eb7211ae"><div class="ttname"><a href="class_server.html#a88407e505af9ae9e2c854939eb7211ae">Server::putBuffer</a></div><div class="ttdeci">void putBuffer(std::vector&lt; int16_t &gt; &amp;ibuffer, float iloudness, std::vector&lt; float &gt; loc)</div><div class="ttdef"><b>Definition:</b> server.cpp:341</div></div>
 <div class="ttc" id="class_server_html_a945fd7fa3bc55e514bcc71b5430979eb"><div class="ttname"><a href="class_server.html#a945fd7fa3bc55e514bcc71b5430979eb">Server::getInstance</a></div><div class="ttdeci">static Server &amp; getInstance(Tracker &amp;trk)</div><div class="ttdef"><b>Definition:</b> server.h:54</div></div>
 <div class="ttc" id="class_server_html_a79c11cbba3cb900d2af5ed383f04a508"><div class="ttname"><a href="class_server.html#a79c11cbba3cb900d2af5ed383f04a508">Server::operator=</a></div><div class="ttdeci">void operator=(Server const &amp;)=delete</div></div>
 <div class="ttc" id="class_server_html_a7e3b7438e1f2e6d22fd0db6c1e2896c1"><div class="ttname"><a href="class_server.html#a7e3b7438e1f2e6d22fd0db6c1e2896c1">Server::operator()</a></div><div class="ttdeci">void operator()(http_server::request const &amp;request, http_server::response &amp;response)</div><div class="ttdef"><b>Definition:</b> server.cpp:53</div></div>
 <div class="ttc" id="server_8h_html_a61e96556f8d946da40f02f732b183107"><div class="ttname"><a href="server_8h.html#a61e96556f8d946da40f02f732b183107">http_server</a></div><div class="ttdeci">http::server&lt; Server &gt; http_server</div><div class="ttdef"><b>Definition:</b> server.h:42</div></div>
 <div class="ttc" id="class_tracker_html"><div class="ttname"><a href="class_tracker.html">Tracker</a></div><div class="ttdef"><b>Definition:</b> tracker.h:58</div></div>
-<div class="ttc" id="class_server_html_a80ae65c21cae8825a22357a336241388"><div class="ttname"><a href="class_server.html#a80ae65c21cae8825a22357a336241388">Server::putBuffer</a></div><div class="ttdeci">void putBuffer(std::vector&lt; int16_t &gt; &amp;ibuffer, float iloudness, std::vector&lt; float &gt; loc, unsigned long iframeNum)</div><div class="ttdef"><b>Definition:</b> server.cpp:341</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 28 2016 15:36:30 for SoundLocalizationALSA by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 28 2016 16:11:25 for SoundLocalizationALSA by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
