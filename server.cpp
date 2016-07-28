@@ -33,7 +33,7 @@
 #include "constants.h"
 #include "soundProcessing.h"
 
-/**
+/*
  * TODO: If I was a good person, we would possibly separate concerns
  *  here ... I've merged the handler with the server, not confident
  *  this is the best design.
