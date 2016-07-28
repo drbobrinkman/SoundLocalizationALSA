@@ -76,7 +76,7 @@ int main() {
     //Find the loudness of the loudest channel
     float loudness = l[0].second;
     int loudest = 0;
-    for(int i=1; i<4; i++){
+    for(int i=1; i<l.size(); i++){
       if(l[i].second > loudness){
 	loudness = l[i].second;
 	loudest = i;
@@ -85,20 +85,18 @@ int main() {
 
     //recenter(m.buffer, l);
     
-    std::pair<float, float> delays[4][4];
-    for(int j=0; j < 4; j++){
-      for(int i=0; i < 4; i++){
-	delays[i][j] = delay(m.buffer, i, j, 2*SENSOR_SPACING_SAMPLES);
-      }
+    std::pair<float, float> delays[NUM_CHANNELS];
+    for(int j=0; j < NUM_CHANNELS; j++){
+      delays[j] = delay(m.buffer, 0, j, 2*SENSOR_SPACING_SAMPLES);
     }
 
     //LUT assumes that stream 0 is the primary stream, so the offets
     // user are 1, 2, and 3 (not 0)
     //Now do a LUT lookup
     std::vector<float> loc = {
-      -delays[0][1].first,
-      -delays[0][2].first,
-      -delays[0][3].first
+      -delays[1].first,
+      -delays[2].first,
+      -delays[3].first
     };
 
     std::vector<float> entry = lut.get(loc);
