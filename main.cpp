@@ -1,4 +1,11 @@
-/**
+/** \file main.cpp
+ * Main controller for the whole project.
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-28
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -22,7 +29,6 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-#include <fstream>
 
 #include "microphone.h"
 #include "locationlut.h"
@@ -33,6 +39,7 @@
 #include "updateServer.h"
 #include "utils.h"
 
+/*! Main controller method for the whole project */
 int main() {
   std::cout << "updating IP Discovery Server" << std::endl;
   updateIPDiscoveryServer();
