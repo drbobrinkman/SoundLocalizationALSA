@@ -1,4 +1,11 @@
-/**
+/** \file soundProcessing.cpp
+ * Collection of functions for various kinds of sound processing.
+ *
+ * \author Bo Brinkman <dr.bo.brinkman@gmail.com>
+ * \date 2016-07-28
+ */
+
+/*
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -21,18 +28,15 @@
 
 #include "soundProcessing.h"
 #include "constants.h"
-#include <cmath>
-#include <cstdint>
-#include <algorithm>
-
-#include <iostream>
+#include <cmath> //For sqrt, abs, and so on
+#include <cstdint> //For int16_t
 
 std::vector<std::pair<float, float> >
 meansAndStdDevs(const std::vector<int16_t>& buffer){
-  float total[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-  float totalSq[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+  float total[NUM_CHANNELS] = {0.0f, 0.0f, 0.0f, 0.0f};
+  float totalSq[NUM_CHANNELS] = {0.0f, 0.0f, 0.0f, 0.0f};
 
-  unsigned int count[4] = {0, 0, 0, 0};
+  unsigned int count[NUM_CHANNELS] = {0, 0, 0, 0};
   //This assumes that the input format is S16_LE
 
   int channel = 0;
@@ -41,7 +45,7 @@ meansAndStdDevs(const std::vector<int16_t>& buffer){
     float val = (float)buffer[i];
     total[channel] += val;
     totalSq[channel] += val*val;
-    channel = (channel+1)%4;
+    channel = (channel+1)%NUM_CHANNELS;
   }
 
   std::vector<std::pair<float, float> > ret;
