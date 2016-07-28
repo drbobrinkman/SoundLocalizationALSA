@@ -35,6 +35,8 @@
 #include "constants.h"
 #include <string>
 
+constexpr char DEVICE_ID[] = "hw:1,0";
+
 Microphone::Microphone() {
   int rc;
   unsigned int val, val2;
@@ -44,7 +46,7 @@ Microphone::Microphone() {
   rate = SAMPLES_PER_SECOND;
   
   /* Open PCM device for playback. */
-  rc = snd_pcm_open(&handle, "hw:1,0",
+  rc = snd_pcm_open(&handle, DEVICE_ID,
 		    SND_PCM_STREAM_CAPTURE, 0);
   if (rc < 0) {
     throw std::string("unable to open pcm device: ") + snd_strerror(rc);
