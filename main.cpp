@@ -41,25 +41,25 @@
 
 /*! Main controller method for the whole project */
 int main() {
-  std::cout << "updating IP Discovery Server" << std::endl;
+  //std::cout << "updating IP Discovery Server" << std::endl;
   updateIPDiscoveryServer();
   
   //Build the LUT before opening the mic
-  std::cout << "building LUT" << std::endl;
+  //std::cout << "building LUT" << std::endl;
   LocationLUT& lut = LocationLUT::getInstance();
 
-  std::cout << "creating Tracker" << std::endl;
+  //std::cout << "creating Tracker" << std::endl;
   Tracker& t = Tracker::getInstance();
 
-  std::cout << "creating Server" << std::endl;
+  //std::cout << "creating Server" << std::endl;
   Server& s = Server::getInstance(t);
 
-  std::cout << "creating Microphone" << std::endl;
+  //std::cout << "creating Microphone" << std::endl;
   Microphone& m = Microphone::getInstance();
   
   long frameNumber = 0;
 
-  std::cout << "main loop starting" << std::endl;
+  //std::cout << "main loop starting" << std::endl;
   //Loop forever. Right now, must kill via ctrl-c
   while(s.isRunning()){
     int retVal;

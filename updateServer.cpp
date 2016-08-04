@@ -81,13 +81,16 @@ void updateIPDiscoveryServer(){
   ifconfigin >> nibble;
   std::string address(nibble.begin() + 1 + nibble.find(":"),
 		      nibble.end());
-  std::cout << "Server running at: |" << address << "|" << std::endl;
+  //std::cout << "Server running at: |" << address << "|" << std::endl;
   http::client client_;
   try {
     http::client::request request_("http://shelvar.com/ip.php?ip=" + address);
     //request_ << http::client::header("Conection", "close");
     
     http::client::response response_ = client_.get(request_);
+    //The purpose of this next line is to force the system to block
+    // until the response is received. get() is async, and we
+    // get a race condition if we don't wait for this to come back
     std::cout << "Discovery service update result: " << body(response_)
 	      << std::endl;;
   } catch (std::exception& e) {

@@ -163,7 +163,7 @@ void LocationLUT::buildLUT(){
 void LocationLUT::loadLUT(){
   std::ifstream infile(FNAME);
   if(infile.is_open()){
-        std::cout << "loading LUT" << std::endl;
+    //std::cout << "loading LUT" << std::endl;
     float floats[7];
     char eatcomma;
     int count;
@@ -194,20 +194,20 @@ void LocationLUT::loadLUT(){
       lut.insert(std::make_pair(key, ent));
     }
   }
-  std::cout << "lut size, loaded: " << lut.size() << std::endl;
+  //std::cout << "lut size, loaded: " << lut.size() << std::endl;
     
   if(lut.size() == 0){
     buildLUT();
     saveLUT();
   }
-  std::cout << "lut size, built: " << lut.size() << std::endl;    
+  //std::cout << "lut size, built: " << lut.size() << std::endl;    
 }
 
 void LocationLUT::saveLUT(){
   static std::vector<float> center = {0.0f, 0.0f, 0.0f};
 
   std::ofstream outfile(FNAME);
-  std::cout << "saving LUT" << std::endl;
+  //std::cout << "saving LUT" << std::endl;
 
   outfile << lut.size() << std::endl;
   outfile << "  d01,   d02,   d03,   dir_x,   dir_y,   dir_z, count"
