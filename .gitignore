@@ -9,3 +9,6 @@ sla
 
 #junk space to hold sound files
 temp
+
+#For security, don't store
+*.keys
